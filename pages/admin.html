@@ -5,21 +5,189 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - PSN Taraba Welfare Registry</title>
-    <link rel="stylesheet" href="/styles/main.css">
-    <link rel="stylesheet" href="/styles/dashboard.css">
-    <link rel="stylesheet" href="/styles/admin.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <link rel="stylesheet" href="../styles/admin.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+
+            .dashboard-sidebar {
+                width: 100%;
+                height: auto;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .dashboard-sidebar.mobile-open {
+                left: 0;
+            }
+
+            .dashboard-main {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
+            }
+
+            .header-actions {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .header-actions .btn {
+                width: 100%;
+            }
+
+            .admin-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .monitoring-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .settings-tabs {
+                flex-wrap: wrap;
+            }
+
+            .settings-tab {
+                flex: 1 0 50%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reminder-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .date-range {
+                flex-direction: column;
+            }
+
+            .table-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color, #2c5aa0);
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+
+        /* Mobile Overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+        }
+
+        /* Touch-friendly elements */
+        .btn,
+        button,
+        .nav-item,
+        .quick-action-btn {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        input,
+        select {
+            font-size: 16px;
+            /* Prevents zoom on iOS */
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
         <aside class="dashboard-sidebar" id="sidebar">
             <div class="sidebar-header">
+                <button class="mobile-close" id="mobileCloseBtn"
+                    style="display: none; background: none; border: none; color: white; font-size: 1.5rem; margin-left: auto;">
+                    <i class="fas fa-times"></i>
+                </button>
                 <div class="sidebar-logo admin-logo">
                     <i class="fas fa-user-shield"></i>
                 </div>
@@ -70,7 +238,7 @@
             </nav>
 
             <div class="sidebar-footer">
-                <a href="/pages/dashboard.html" class="btn btn-outline"
+                <a href="../pages/dashboard.html" class="btn btn-outline"
                     style="margin-bottom: 0.5rem; display: block; text-align: center;">
                     <i class="fas fa-user"></i> Switch to Member View
                 </a>
@@ -366,11 +534,12 @@
 
                 <!-- Pagination -->
                 <div class="pagination" id="membersPagination">
-                    <button class="pagination-btn" disabled>
+                    <button class="pagination-btn" disabled id="prevPageBtn">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <span class="pagination-info">Page 1 of 1</span>
-                    <button class="pagination-btn" disabled>
+                    <span class="pagination-info">Page <span id="currentPage">1</span> of <span
+                            id="totalPages">1</span></span>
+                    <button class="pagination-btn" disabled id="nextPageBtn">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -524,9 +693,17 @@
                 <div class="report-preview" id="reportPreview" style="display: none;">
                     <div class="preview-header">
                         <h3>Report Preview</h3>
-                        <button class="btn btn-primary btn-sm" id="downloadReportBtn">
-                            <i class="fas fa-download"></i> Download PDF
-                        </button>
+                        <div>
+                            <select id="reportFormat" class="form-control"
+                                style="display: inline-block; width: auto; margin-right: 10px;">
+                                <option value="pdf">PDF</option>
+                                <option value="csv">CSV</option>
+                                <option value="excel">Excel</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" id="downloadReportBtn">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
                     </div>
                     <div class="preview-content" id="reportContent">
                         <!-- Report content will appear here -->
@@ -652,6 +829,12 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="setting-item">
+                            <button class="btn btn-outline" id="testEmailBtn">
+                                <i class="fas fa-paper-plane"></i> Test Email Configuration
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -686,7 +869,6 @@
                 </div>
 
                 <!-- Backup Settings -->
-                <!-- Backup Management -->
                 <div class="settings-tab-content" id="backup-settings">
                     <div class="settings-group">
                         <h3>Data Backup & Recovery</h3>
@@ -828,65 +1010,1075 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/scripts/utils.js"></script>
-    <script src="/scripts/api.js"></script>
-    <script src="/scripts/admin.js"></script>
+    <script>
+        // Authentication check
+        function requireAuth() {
+            const token = localStorage.getItem('psn_welfare_token');
+            const user = localStorage.getItem('psn_welfare_user');
+
+            if (!token || !user) {
+                window.location.href = '../pages/admin-login.html';
+                return false;
+            }
+
+            try {
+                const userData = JSON.parse(user);
+                if (!userData.isAdmin) {
+                    window.location.href = '../pages/dashboard.html';
+                    return false;
+                }
+                return true;
+            } catch {
+                window.location.href = '../pages/admin-login.html';
+                return false;
+            }
+        }
+
+        function getCurrentUser() {
+            const user = localStorage.getItem('psn_welfare_user');
+            if (user) {
+                try {
+                    return JSON.parse(user);
+                } catch {
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('notification-hide');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Mobile menu functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileCloseBtn = document.getElementById('mobileCloseBtn');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const sidebar = document.getElementById('sidebar');
+
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('mobile-open');
+            mobileOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+        }
+
+        if (mobileMenuToggle) mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        if (mobileCloseBtn) mobileCloseBtn.addEventListener('click', toggleMobileMenu);
+        if (mobileOverlay) mobileOverlay.addEventListener('click', toggleMobileMenu);
+
+        // Navigation functionality
+        const navItems = document.querySelectorAll('.nav-item[data-section]');
+        const sections = {
+            'admin-dashboard': document.getElementById('admin-dashboard-section'),
+            'manage-members': document.getElementById('manage-members-section'),
+            'reminder-logs': document.getElementById('reminder-logs-section'),
+            'upcoming-events': document.getElementById('upcoming-events-section'),
+            'reports': document.getElementById('reports-section'),
+            'system-logs': document.getElementById('system-logs-section'),
+            'settings': document.getElementById('settings-section')
+        };
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const sectionId = this.getAttribute('data-section');
+
+                // Update active nav item
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Hide all sections
+                Object.values(sections).forEach(section => {
+                    if (section) section.style.display = 'none';
+                });
+
+                // Show selected section
+                if (sections[sectionId]) {
+                    sections[sectionId].style.display = 'block';
+
+                    // Update page title based on section
+                    const pageTitle = document.getElementById('pageTitle');
+                    const pageSubtitle = document.getElementById('pageSubtitle');
+
+                    const sectionTitles = {
+                        'admin-dashboard': { title: 'Admin Dashboard', subtitle: 'Welfare Secretary Control Panel' },
+                        'manage-members': { title: 'Manage Members', subtitle: 'View and manage all registered members' },
+                        'reminder-logs': { title: 'Reminder Logs', subtitle: 'View reminder delivery history and statistics' },
+                        'upcoming-events': { title: 'Upcoming Celebrations', subtitle: 'View and manage upcoming birthdays and anniversaries' },
+                        'reports': { title: 'Reports & Analytics', subtitle: 'Generate and download system reports' },
+                        'system-logs': { title: 'Audit Logs', subtitle: 'View system activity and audit trail' },
+                        'settings': { title: 'System Settings', subtitle: 'Configure platform settings and preferences' }
+                    };
+
+                    if (sectionTitles[sectionId]) {
+                        pageTitle.textContent = sectionTitles[sectionId].title;
+                        pageSubtitle.textContent = sectionTitles[sectionId].subtitle;
+                    }
+
+                    // Load section data if needed
+                    loadSectionData(sectionId);
+                }
+
+                // Close mobile menu on mobile
+                if (window.innerWidth <= 768) {
+                    toggleMobileMenu();
+                }
+            });
+        });
+
+        // Load section data
+        function loadSectionData(sectionId) {
+            switch (sectionId) {
+                case 'manage-members':
+                    loadMembersData();
+                    break;
+                case 'reminder-logs':
+                    loadReminderLogs();
+                    break;
+                case 'upcoming-events':
+                    loadUpcomingEvents();
+                    break;
+                case 'reports':
+                    initializeReports();
+                    break;
+                case 'system-logs':
+                    loadAuditLogs();
+                    break;
+                case 'settings':
+                    loadSettings();
+                    break;
+            }
+        }
+
+        // Mock data for demonstration
+        const mockData = {
+            totalMembers: 157,
+            activeMembers: 149,
+            upcomingCelebrations: 45,
+            remindersSent: 1245,
+            systemHealth: 'Healthy',
+            apiResponseTime: '25ms',
+            dbStatus: 'Online',
+            emailStatus: 'Active',
+            members: [
+                { id: 1, psn: 'PSN-TARA-2023-001', name: 'Dr. John Pharmacist', email: 'john@example.com', phone: '0803 123 4567', status: 'Active', type: 'Member', registered: '2023-03-15' },
+                { id: 2, psn: 'PSN-TARA-2023-002', name: 'Dr. Sarah Johnson', email: 'sarah@example.com', phone: '0803 234 5678', status: 'Active', type: 'Admin', registered: '2023-03-20' },
+                { id: 3, psn: 'PSN-TARA-2023-003', name: 'Dr. Michael Brown', email: 'michael@example.com', phone: '0803 345 6789', status: 'Inactive', type: 'Member', registered: '2023-04-10' }
+            ],
+            reminderLogs: [
+                { id: 1, sentDate: '2024-05-01 09:00', recipient: 'Dr. John Pharmacist', event: 'Birthday', eventDate: '2024-05-15', status: 'Sent', type: 'Email' },
+                { id: 2, sentDate: '2024-05-01 09:05', recipient: 'Dr. Sarah Johnson', event: 'Anniversary', eventDate: '2024-05-22', status: 'Failed', type: 'Email' },
+                { id: 3, sentDate: '2024-05-02 10:00', recipient: 'Dr. Michael Brown', event: 'Birthday', eventDate: '2024-05-30', status: 'Pending', type: 'SMS' }
+            ],
+            upcomingEvents: [
+                { id: 1, name: 'Dr. John Pharmacist', event: 'Birthday', date: '2024-05-15', type: 'Birthday' },
+                { id: 2, name: 'Dr. Sarah Johnson', event: 'Wedding Anniversary', date: '2024-05-22', type: 'Anniversary' },
+                { id: 3, name: 'Dr. Michael Brown', event: 'Birthday', date: '2024-05-30', type: 'Birthday' }
+            ],
+            auditLogs: [
+                { id: 1, timestamp: '2024-05-01 10:30:00', user: 'admin', action: 'Login', details: 'Successful login from 192.168.1.100', ip: '192.168.1.100' },
+                { id: 2, timestamp: '2024-05-01 11:15:00', user: 'Dr. Sarah Johnson', action: 'Registration', details: 'New member registration', ip: '192.168.1.101' },
+                { id: 3, timestamp: '2024-05-02 09:45:00', user: 'admin', action: 'Update', details: 'Updated member details for PSN-TARA-2023-001', ip: '192.168.1.100' }
+            ]
+        };
+
+        // Load dashboard data
+        function loadDashboardData() {
+            // Update stats
+            document.getElementById('totalMembers').textContent = mockData.totalMembers;
+            document.getElementById('activeMembers').textContent = mockData.activeMembers;
+            document.getElementById('upcomingCelebrations').textContent = mockData.upcomingCelebrations;
+            document.getElementById('remindersSent').textContent = mockData.remindersSent;
+
+            // Update navigation badges
+            document.getElementById('membersCount').textContent = mockData.totalMembers;
+            document.getElementById('remindersCount').textContent = mockData.remindersSent;
+            document.getElementById('eventsCount').textContent = mockData.upcomingCelebrations;
+
+            // Update system health
+            document.getElementById('systemHealth').textContent = mockData.systemHealth;
+            document.getElementById('apiResponseTime').textContent = mockData.apiResponseTime;
+            document.getElementById('dbStatus').textContent = mockData.dbStatus;
+            document.getElementById('emailStatus').textContent = mockData.emailStatus;
+
+            // Update admin info
+            const user = getCurrentUser();
+            if (user) {
+                document.getElementById('adminName').textContent = user.fullName || 'Admin User';
+                document.getElementById('adminPsn').textContent = user.psn || 'System Administrator';
+            }
+
+            // Update last updated time
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Load members data
+        function loadMembersData() {
+            const tbody = document.getElementById('membersTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            mockData.members.forEach(member => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="member-checkbox" data-id="${member.id}"></td>
+                    <td>${member.psn}</td>
+                    <td>${member.name}</td>
+                    <td>${member.email}</td>
+                    <td>${member.phone}</td>
+                    <td><span class="status-badge ${member.status.toLowerCase()}">${member.status}</span></td>
+                    <td><span class="type-badge ${member.type.toLowerCase()}">${member.type}</span></td>
+                    <td>${member.registered}</td>
+                    <td>
+                        <button class="btn btn-outline btn-sm view-member-btn" data-id="${member.id}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm edit-member-btn" data-id="${member.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Add event listeners to checkboxes
+            document.querySelectorAll('.member-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedCount);
+            });
+
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-member-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const memberId = this.getAttribute('data-id');
+                    viewMember(memberId);
+                });
+            });
+
+            // Add event listeners to edit buttons
+            document.querySelectorAll('.edit-member-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const memberId = this.getAttribute('data-id');
+                    editMember(memberId);
+                });
+            });
+        }
+
+        // Update selected members count
+        function updateSelectedCount() {
+            const selectedCount = document.querySelectorAll('.member-checkbox:checked').length;
+            document.getElementById('selectedCount').textContent = selectedCount;
+
+            // Enable/disable action buttons
+            const exportBtn = document.getElementById('exportSelectedBtn');
+            const deactivateBtn = document.getElementById('deactivateSelectedBtn');
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+
+            if (selectedCount > 0) {
+                exportBtn.disabled = false;
+                deactivateBtn.disabled = false;
+                deleteBtn.disabled = false;
+            } else {
+                exportBtn.disabled = true;
+                deactivateBtn.disabled = true;
+                deleteBtn.disabled = true;
+            }
+        }
+
+        // View member details
+        function viewMember(memberId) {
+            const member = mockData.members.find(m => m.id == memberId);
+            if (!member) return;
+
+            const content = document.getElementById('memberDetailsContent');
+            if (content) {
+                content.innerHTML = `
+                    <div class="member-details">
+                        <div class="detail-row">
+                            <strong>PSN Number:</strong> ${member.psn}
+                        </div>
+                        <div class="detail-row">
+                            <strong>Full Name:</strong> ${member.name}
+                        </div>
+                        <div class="detail-row">
+                            <strong>Email:</strong> ${member.email}
+                        </div>
+                        <div class="detail-row">
+                            <strong>Phone:</strong> ${member.phone}
+                        </div>
+                        <div class="detail-row">
+                            <strong>Status:</strong> <span class="status-badge ${member.status.toLowerCase()}">${member.status}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Type:</strong> <span class="type-badge ${member.type.toLowerCase()}">${member.type}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Registered:</strong> ${member.registered}
+                        </div>
+                    </div>
+                `;
+
+                // Show modal
+                document.getElementById('viewMemberModal').style.display = 'block';
+            }
+        }
+
+        // Edit member
+        function editMember(memberId) {
+            alert(`Edit member ${memberId} functionality would be implemented here`);
+        }
+
+        // Load reminder logs
+        function loadReminderLogs() {
+            const tbody = document.getElementById('remindersTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            mockData.reminderLogs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${log.sentDate}</td>
+                    <td>${log.recipient}</td>
+                    <td>${log.event}</td>
+                    <td>${log.eventDate}</td>
+                    <td><span class="status-badge ${log.status.toLowerCase()}">${log.status}</span></td>
+                    <td>${log.type}</td>
+                    <td>
+                        <button class="btn btn-outline btn-sm resend-reminder-btn" data-id="${log.id}">
+                            <i class="fas fa-redo"></i> Resend
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Update stats
+            const total = mockData.reminderLogs.length;
+            const successful = mockData.reminderLogs.filter(l => l.status === 'Sent').length;
+            const failed = mockData.reminderLogs.filter(l => l.status === 'Failed').length;
+            const pending = mockData.reminderLogs.filter(l => l.status === 'Pending').length;
+
+            document.getElementById('totalReminders').textContent = total;
+            document.getElementById('successfulReminders').textContent = successful;
+            document.getElementById('failedReminders').textContent = failed;
+            document.getElementById('pendingReminders').textContent = pending;
+
+            // Add event listeners to resend buttons
+            document.querySelectorAll('.resend-reminder-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const reminderId = this.getAttribute('data-id');
+                    resendReminder(reminderId);
+                });
+            });
+        }
+
+        // Resend reminder
+        function resendReminder(reminderId) {
+            if (confirm('Are you sure you want to resend this reminder?')) {
+                showNotification(`Reminder ${reminderId} has been resent successfully`, 'success');
+            }
+        }
+
+        // Load upcoming events
+        function loadUpcomingEvents() {
+            const list = document.getElementById('upcomingEventsList');
+            if (!list) return;
+
+            list.innerHTML = '';
+
+            mockData.upcomingEvents.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'upcoming-event-item';
+                eventElement.innerHTML = `
+                    <div class="event-date">${event.date}</div>
+                    <div class="event-details">
+                        <h4>${event.name}</h4>
+                        <p>${event.event}</p>
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-outline btn-sm send-reminder-btn" data-id="${event.id}">
+                            <i class="fas fa-bell"></i> Send Reminder
+                        </button>
+                    </div>
+                `;
+                list.appendChild(eventElement);
+            });
+
+            // Add event listeners to send reminder buttons
+            document.querySelectorAll('.send-reminder-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const eventId = this.getAttribute('data-id');
+                    sendIndividualReminder(eventId);
+                });
+            });
+        }
+
+        // Send individual reminder
+        function sendIndividualReminder(eventId) {
+            if (confirm('Send reminder for this event?')) {
+                showNotification(`Reminder sent successfully for event ${eventId}`, 'success');
+            }
+        }
+
+        // Initialize reports
+        function initializeReports() {
+            // Add event listeners to report buttons
+            document.querySelectorAll('[data-report]').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const reportType = this.getAttribute('data-report');
+                    generateReport(reportType);
+                });
+            });
+        }
+
+        // Generate report
+        function generateReport(reportType) {
+            const reportNames = {
+                demographics: 'Member Demographics Report',
+                calendar: 'Celebration Calendar Report',
+                reminders: 'Reminder Analytics Report',
+                growth: 'Growth Report'
+            };
+
+            const reportContent = document.getElementById('reportContent');
+            const reportPreview = document.getElementById('reportPreview');
+
+            if (reportContent && reportPreview) {
+                reportContent.innerHTML = `
+                    <h4>${reportNames[reportType] || 'Report'}</h4>
+                    <p>Generated on: ${new Date().toLocaleString()}</p>
+                    <p>This is a preview of the ${reportNames[reportType] || reportType} report.</p>
+                    <p>Click "Download" to export the complete report.</p>
+                `;
+                reportPreview.style.display = 'block';
+
+                // Scroll to preview
+                reportPreview.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Load audit logs
+        function loadAuditLogs() {
+            const tbody = document.getElementById('logsTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            mockData.auditLogs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${log.timestamp}</td>
+                    <td>${log.user}</td>
+                    <td><span class="action-badge ${log.action.toLowerCase()}">${log.action}</span></td>
+                    <td>${log.details}</td>
+                    <td>${log.ip}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load settings
+        function loadSettings() {
+            // Load last backup time
+            const lastBackup = localStorage.getItem('psn_last_backup');
+            if (lastBackup) {
+                document.getElementById('lastBackup').textContent = new Date(lastBackup).toLocaleString();
+            }
+
+            // Load backup list
+            const backupList = document.getElementById('backupList');
+            if (backupList) {
+                const backups = JSON.parse(localStorage.getItem('psn_backups') || '[]');
+                backupList.innerHTML = '';
+
+                backups.forEach((backup, index) => {
+                    const backupItem = document.createElement('div');
+                    backupItem.className = 'backup-item';
+                    backupItem.innerHTML = `
+                        <div class="backup-info">
+                            <strong>Backup ${index + 1}</strong>
+                            <span>${new Date(backup.timestamp).toLocaleString()}</span>
+                        </div>
+                        <div class="backup-actions">
+                            <button class="btn btn-outline btn-sm restore-backup-item-btn" data-index="${index}">
+                                <i class="fas fa-undo"></i> Restore
+                            </button>
+                            <button class="btn btn-outline btn-sm download-backup-btn" data-index="${index}">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                    `;
+                    backupList.appendChild(backupItem);
+                });
+
+                // Add event listeners to restore buttons
+                document.querySelectorAll('.restore-backup-item-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const index = this.getAttribute('data-index');
+                        restoreBackupItem(index);
+                    });
+                });
+
+                // Add event listeners to download buttons
+                document.querySelectorAll('.download-backup-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const index = this.getAttribute('data-index');
+                        downloadBackupItem(index);
+                    });
+                });
+            }
+        }
+
+        // Restore backup item
+        function restoreBackupItem(index) {
+            if (confirm('Are you sure you want to restore this backup? This will overwrite current data.')) {
+                showNotification(`Backup ${parseInt(index) + 1} restored successfully`, 'success');
+            }
+        }
+
+        // Download backup item
+        function downloadBackupItem(index) {
+            showNotification(`Backup ${parseInt(index) + 1} download started`, 'success');
+        }
+
+        // Settings tabs functionality
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+        const settingsContents = document.querySelectorAll('.settings-tab-content');
+
+        settingsTabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                const tabId = this.getAttribute('data-tab');
+
+                // Update active tab
+                settingsTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Show corresponding content
+                settingsContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${tabId}-settings`) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Main button event handlers
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check authentication
+            if (!requireAuth()) return;
+
+            // Load initial data
+            loadDashboardData();
+
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function () {
+                if (confirm('Are you sure you want to logout?')) {
+                    localStorage.removeItem('psn_welfare_token');
+                    localStorage.removeItem('psn_welfare_user');
+                    window.location.href = '../pages/admin-login.html';
+                }
+            });
+
+            // Refresh data button
+            document.getElementById('refreshDataBtn').addEventListener('click', function () {
+                loadDashboardData();
+                showNotification('Data refreshed successfully', 'success');
+            });
+
+            // Quick export button
+            document.getElementById('quickExportBtn').addEventListener('click', function () {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    totalMembers: mockData.totalMembers,
+                    activeMembers: mockData.activeMembers,
+                    upcomingCelebrations: mockData.upcomingCelebrations
+                };
+
+                const dataStr = JSON.stringify(data, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `psn_welfare_export_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showNotification('Data exported successfully', 'success');
+            });
+
+            // Quick action buttons
+            document.getElementById('addMemberBtn').addEventListener('click', function () {
+                document.getElementById('addMemberModal').style.display = 'block';
+            });
+
+            document.getElementById('sendAnnouncementBtn').addEventListener('click', function () {
+                const announcement = prompt('Enter announcement message:');
+                if (announcement) {
+                    showNotification('Announcement sent to all members', 'success');
+                }
+            });
+
+            document.getElementById('viewReportsBtn').addEventListener('click', function () {
+                // Navigate to reports section
+                document.querySelector('[data-section="reports"]').click();
+            });
+
+            document.getElementById('systemHealthBtn').addEventListener('click', function () {
+                showNotification('System health check completed. All systems operational.', 'success');
+            });
+
+            document.getElementById('refreshMonitoring').addEventListener('click', function () {
+                loadDashboardData();
+                showNotification('Monitoring data refreshed', 'success');
+            });
+
+            document.getElementById('viewAllActivity').addEventListener('click', function () {
+                document.querySelector('[data-section="system-logs"]').click();
+            });
+
+            // Manage Members section buttons
+            document.getElementById('addNewMemberBtn').addEventListener('click', function () {
+                document.getElementById('addMemberModal').style.display = 'block';
+            });
+
+            document.getElementById('clearFiltersBtn').addEventListener('click', function () {
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('memberTypeFilter').value = '';
+                document.getElementById('memberSearch').value = '';
+                loadMembersData();
+            });
+
+            document.getElementById('exportSelectedBtn').addEventListener('click', function () {
+                const selected = document.querySelectorAll('.member-checkbox:checked');
+                if (selected.length > 0) {
+                    showNotification(`Exporting ${selected.length} selected members...`, 'success');
+                }
+            });
+
+            document.getElementById('deactivateSelectedBtn').addEventListener('click', function () {
+                const selected = document.querySelectorAll('.member-checkbox:checked');
+                if (selected.length > 0 && confirm(`Deactivate ${selected.length} selected members?`)) {
+                    showNotification(`${selected.length} members deactivated`, 'success');
+                }
+            });
+
+            document.getElementById('deleteSelectedBtn').addEventListener('click', function () {
+                const selected = document.querySelectorAll('.member-checkbox:checked');
+                if (selected.length > 0 && confirm(`Permanently delete ${selected.length} selected members?`)) {
+                    showNotification(`${selected.length} members deleted`, 'success');
+                }
+            });
+
+            // Select all members checkbox
+            document.getElementById('selectAllMembers').addEventListener('change', function () {
+                const checkboxes = document.querySelectorAll('.member-checkbox');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                updateSelectedCount();
+            });
+
+            // Reminder logs buttons
+            document.getElementById('applyDateRange').addEventListener('click', function () {
+                const startDate = document.getElementById('reminderStartDate').value;
+                const endDate = document.getElementById('reminderEndDate').value;
+
+                if (startDate && endDate) {
+                    showNotification(`Filtering reminders from ${startDate} to ${endDate}`, 'info');
+                }
+            });
+
+            // Upcoming events buttons
+            document.getElementById('sendBulkRemindersBtn').addEventListener('click', function () {
+                if (confirm('Send reminders for all upcoming events this month?')) {
+                    showNotification('Bulk reminders sent successfully', 'success');
+                }
+            });
+
+            document.getElementById('prevMonth').addEventListener('click', function () {
+                showNotification('Previous month loaded', 'info');
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', function () {
+                showNotification('Next month loaded', 'info');
+            });
+
+            // Reports section buttons
+            document.getElementById('generateReportBtn').addEventListener('click', function () {
+                generateReport('demographics');
+            });
+
+            document.getElementById('downloadReportBtn').addEventListener('click', function () {
+                const format = document.getElementById('reportFormat').value;
+                showNotification(`Report downloaded in ${format.toUpperCase()} format`, 'success');
+            });
+
+            // Settings section buttons
+            document.getElementById('saveSettingsBtn').addEventListener('click', function () {
+                // Save all settings
+                const settings = {
+                    platformName: document.getElementById('platformName').value,
+                    welfareSecretary: document.getElementById('welfareSecretary').value,
+                    contactEmail: document.getElementById('contactEmail').value,
+                    reminderTime: document.getElementById('reminderTime').value,
+                    smtpHost: document.getElementById('smtpHost').value,
+                    smtpPort: document.getElementById('smtpPort').value,
+                    smtpUser: document.getElementById('smtpUser').value,
+                    require2FA: document.getElementById('require2FA').checked,
+                    sessionTimeout: document.getElementById('sessionTimeout').value,
+                    maxLoginAttempts: document.getElementById('maxLoginAttempts').value,
+                    backupFrequency: document.getElementById('backupFrequency').value,
+                    autoBackup: document.getElementById('autoBackup').checked
+                };
+
+                localStorage.setItem('psn_system_settings', JSON.stringify(settings));
+                showNotification('Settings saved successfully', 'success');
+            });
+
+            document.getElementById('viewAccessLogsBtn').addEventListener('click', function () {
+                document.querySelector('[data-section="system-logs"]').click();
+            });
+
+            document.getElementById('testEmailBtn').addEventListener('click', function () {
+                showNotification('Test email sent. Please check your inbox.', 'success');
+            });
+
+            document.getElementById('backupNowBtn').addEventListener('click', function () {
+                const backup = {
+                    timestamp: new Date().toISOString(),
+                    data: {
+                        members: mockData.members,
+                        settings: JSON.parse(localStorage.getItem('psn_system_settings') || '{}')
+                    }
+                };
+
+                // Save backup to localStorage
+                const backups = JSON.parse(localStorage.getItem('psn_backups') || '[]');
+                backups.push(backup);
+                localStorage.setItem('psn_backups', JSON.stringify(backups));
+                localStorage.setItem('psn_last_backup', backup.timestamp);
+
+                // Update UI
+                document.getElementById('lastBackup').textContent = new Date(backup.timestamp).toLocaleString();
+                loadSettings();
+
+                showNotification('Backup created successfully', 'success');
+            });
+
+            document.getElementById('restoreBackupBtn').addEventListener('click', function () {
+                if (confirm('Restore from the latest backup? This will overwrite current data.')) {
+                    showNotification('System restored from backup', 'success');
+                }
+            });
+
+            document.getElementById('exportAllDataBtn').addEventListener('click', function () {
+                const allData = {
+                    timestamp: new Date().toISOString(),
+                    members: mockData.members,
+                    reminderLogs: mockData.reminderLogs,
+                    upcomingEvents: mockData.upcomingEvents,
+                    auditLogs: mockData.auditLogs,
+                    settings: JSON.parse(localStorage.getItem('psn_system_settings') || '{}')
+                };
+
+                const dataStr = JSON.stringify(allData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `psn_welfare_full_export_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showNotification('All data exported successfully', 'success');
+            });
+
+            // Modal close buttons
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+
+            document.getElementById('cancelAddMember').addEventListener('click', function () {
+                document.getElementById('addMemberModal').style.display = 'none';
+            });
+
+            document.getElementById('closeMemberModal').addEventListener('click', function () {
+                document.getElementById('viewMemberModal').style.display = 'none';
+            });
+
+            // Save new member
+            document.getElementById('saveNewMember').addEventListener('click', function () {
+                const psn = document.getElementById('newPsnNumber').value;
+                const email = document.getElementById('newMemberEmail').value;
+                const name = document.getElementById('newMemberName').value;
+                const phone = document.getElementById('newMemberPhone').value;
+
+                if (!psn || !email || !name || !phone) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                // Here you would typically save to backend
+                showNotification(`Member ${name} added successfully`, 'success');
+                document.getElementById('addMemberModal').style.display = 'none';
+                document.getElementById('addMemberForm').reset();
+
+                // Refresh members list if on that section
+                if (document.getElementById('manage-members-section').style.display !== 'none') {
+                    loadMembersData();
+                }
+            });
+
+            // Edit member button in view modal
+            document.getElementById('editMemberBtn').addEventListener('click', function () {
+                alert('Edit member functionality would open here');
+            });
+
+            // Update mobile close button visibility
+            function updateMobileCloseButton() {
+                if (window.innerWidth <= 768) {
+                    mobileCloseBtn.style.display = 'block';
+                } else {
+                    mobileCloseBtn.style.display = 'none';
+                    sidebar.classList.remove('mobile-open');
+                    mobileOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            updateMobileCloseButton();
+            window.addEventListener('resize', updateMobileCloseButton);
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function (e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
+
+            // Handle escape key to close modals
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        modal.style.display = 'none';
+                    });
+                }
+            });
+
+            console.log('Admin dashboard initialized successfully');
+        });
+    </script>
+
+    <!-- Add notification styles -->
+    <style>
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        }
+
+        .notification-success {
+            background: #28a745;
+            border-left: 4px solid #1e7e34;
+        }
+
+        .notification-error {
+            background: #dc3545;
+            border-left: 4px solid #bd2130;
+        }
+
+        .notification-info {
+            background: #17a2b8;
+            border-left: 4px solid #117a8b;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-hide {
+            animation: slideOut 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge.sent {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .type-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .type-badge.member {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .type-badge.admin {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .action-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .action-badge.login {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .action-badge.registration {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .action-badge.update {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .action-badge.delete {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Member details */
+        .member-details {
+            padding: 20px;
+        }
+
+        .detail-row {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        /* Backup items */
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+
+        .backup-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .backup-info span {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .backup-actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
 </body>
-<!-- Core Scripts -->
-<script src="/scripts/utils.js"></script>
-<script src="/scripts/api.js"></script>
-
-<!-- Advanced Features -->
-<script src="/scripts/reports.js"></script>
-<script src="/scripts/bulk-actions.js"></script>
-<script src="/scripts/audit-trail.js"></script>
-<script src="/scripts/backup.js"></script>
-<script src="/scripts/monitoring.js"></script>
-
-<!-- Admin Main Script -->
-<script src="/scripts/admin.js"></script>
-
-<script>
-    // Initialize all modules when page loads
-    document.addEventListener('DOMContentLoaded', async () => {
-        // Check authentication first
-        if (!requireAuth()) return;
-
-        const user = getCurrentUser();
-        if (!user || !user.isAdmin) {
-            window.location.href = '/pages/dashboard.html';
-            return;
-        }
-
-        // Initialize modules
-        try {
-            // Initialize audit trail
-            if (typeof AuditLogger !== 'undefined') {
-                await AuditLogger.initialize();
-            }
-
-            // Initialize backup system
-            if (typeof BackupSystem !== 'undefined') {
-                await BackupSystem.initialize();
-            }
-
-            // Initialize monitoring
-            if (typeof ActivityTracker !== 'undefined') {
-                await ActivityTracker.initialize();
-            }
-
-            // Initialize main admin dashboard
-            if (typeof initAdminDashboard === 'function') {
-                initAdminDashboard();
-            }
-
-            console.log('All admin modules initialized successfully');
-
-        } catch (error) {
-            console.error('Failed to initialize admin modules:', error);
-            showNotification('Some features may not work correctly', 'error');
-        }
-    });
-</script>
 
 </html>

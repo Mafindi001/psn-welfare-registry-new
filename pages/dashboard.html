@@ -5,15 +5,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - PSN Taraba Welfare Registry</title>
-    <link rel="stylesheet" href="/styles/main.css">
-    <link rel="stylesheet" href="/styles/dashboard.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Mobile Responsive Additions */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+
+            .dashboard-sidebar {
+                width: 100%;
+                height: auto;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .dashboard-sidebar.mobile-open {
+                left: 0;
+            }
+
+            .dashboard-main {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
+            }
+
+            .header-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .header-actions .btn {
+                width: 100%;
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dates-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            .modal-lg {
+                width: 98%;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+
+            .overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .event-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .event-actions .btn {
+                width: 100%;
+            }
+
+            .nextkin-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .form-row .form-group {
+                width: 100%;
+            }
+        }
+
+        /* Mobile Menu Toggle Button */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color, #2c5aa0);
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .dashboard-header {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .header-title {
+                order: 2;
+                flex: 1 1 100%;
+            }
+
+            .header-actions {
+                order: 3;
+                flex: 1 1 100%;
+            }
+        }
+
+        /* Responsive Table */
+        @media (max-width: 600px) {
+            .dates-table thead {
+                display: none;
+            }
+
+            .dates-table tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            .dates-table td {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+
+            .dates-table td:last-child {
+                border-bottom: none;
+            }
+
+            .dates-table td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #666;
+                margin-right: 10px;
+            }
+        }
+
+        /* Touch-friendly buttons */
+        @media (max-width: 768px) {
+
+            .btn,
+            button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .nav-item {
+                padding: 15px 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Mobile Overlay -->
+    <div class="overlay" id="mobileOverlay"></div>
+
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
         <aside class="dashboard-sidebar" id="sidebar">
@@ -25,6 +233,10 @@
                     <h3 style="margin: 0; font-size: 1.1rem;">PSN Taraba</h3>
                     <p style="margin: 0; font-size: 0.8rem; color: var(--text-light);">Welfare Registry</p>
                 </div>
+                <button class="mobile-close" id="mobileCloseBtn"
+                    style="display: none; background: none; border: none; color: white; font-size: 1.5rem; margin-left: auto;">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <div class="sidebar-user">
@@ -57,6 +269,15 @@
                 <a href="#settings" class="nav-item" data-section="settings">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
+                </a>
+                <!-- Added Links -->
+                <a href="../index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home Page</span>
+                </a>
+                <a href="../pages/admin-login.html" class="nav-item" style="background: rgba(255,255,255,0.1);">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin Login</span>
                 </a>
             </nav>
 
@@ -155,10 +376,10 @@
                         <p class="event-days">In <span class="highlight">45 days</span></p>
                         <p>Annual reminder enabled</p>
                         <div class="event-actions">
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm edit-date-btn">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm disable-reminder-btn">
                                 <i class="fas fa-bell-slash"></i> Disable
                             </button>
                         </div>
@@ -172,10 +393,10 @@
                         <p class="event-days">In <span class="highlight">83 days</span></p>
                         <p>Reminder to: You & Next of Kin</p>
                         <div class="event-actions">
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm edit-date-btn">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm delete-date-btn">
                                 <i class="fas fa-trash"></i> Remove
                             </button>
                         </div>
@@ -189,7 +410,7 @@
                         <p class="event-days">Reminder sent yesterday</p>
                         <p>Annual reminder enabled</p>
                         <div class="event-actions">
-                            <button class="btn btn-primary btn-sm">
+                            <button class="btn btn-primary btn-sm mark-celebrated-btn">
                                 <i class="fas fa-check"></i> Mark Celebrated
                             </button>
                         </div>
@@ -308,16 +529,17 @@
                     <tbody id="datesTableBody">
                         <!-- Dates will be loaded dynamically -->
                         <tr>
-                            <td class="date-label">Birthday</td>
-                            <td class="date-value">15/05/1985</td>
-                            <td><i class="fas fa-check" style="color: var(--secondary-color);"></i></td>
-                            <td>You & Next of Kin</td>
-                            <td><span class="date-status status-active">Active</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm">
+                            <td class="date-label" data-label="Event">Birthday</td>
+                            <td class="date-value" data-label="Date">15/05/1985</td>
+                            <td data-label="Annual"><i class="fas fa-check" style="color: var(--secondary-color);"></i>
+                            </td>
+                            <td data-label="Reminders">You & Next of Kin</td>
+                            <td data-label="Status"><span class="date-status status-active">Active</span></td>
+                            <td data-label="Actions">
+                                <button class="btn btn-outline btn-sm edit-date-btn">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-outline btn-sm">
+                                <button class="btn btn-outline btn-sm delete-date-btn">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -354,10 +576,10 @@
                             </div>
                         </div>
                         <div class="event-actions">
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm edit-kin-btn">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button class="btn btn-outline btn-sm">
+                            <button class="btn btn-outline btn-sm delete-kin-btn">
                                 <i class="fas fa-trash"></i> Remove
                             </button>
                         </div>
@@ -414,16 +636,16 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Today, 9:00 AM</td>
-                            <td>Birthday</td>
-                            <td>You & Next of Kin</td>
-                            <td><span class="date-status status-active">Sent</span></td>
+                            <td data-label="Date Sent">Today, 9:00 AM</td>
+                            <td data-label="Event">Birthday</td>
+                            <td data-label="Recipient">You & Next of Kin</td>
+                            <td data-label="Status"><span class="date-status status-active">Sent</span></td>
                         </tr>
                         <tr>
-                            <td>15 March, 10:30 AM</td>
-                            <td>Welcome Reminder</td>
-                            <td>You</td>
-                            <td><span class="date-status status-active">Sent</span></td>
+                            <td data-label="Date Sent">15 March, 10:30 AM</td>
+                            <td data-label="Event">Welcome Reminder</td>
+                            <td data-label="Recipient">You</td>
+                            <td data-label="Status"><span class="date-status status-active">Sent</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -579,10 +801,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="/scripts/utils.js"></script>
-    <script src="/scripts/api.js"></script>
-    <script src="/scripts/dashboard.js"></script>
     <!-- Edit Profile Modal -->
     <div class="modal" id="editProfileModal">
         <div class="modal-content modal-lg">
@@ -782,6 +1000,263 @@
             <hr>
         </div>
     </template>
+
+    <!-- Scripts -->
+    <script src="../scripts/utils.js"></script>
+    <script src="../scripts/api.js"></script>
+    <script src="../scripts/dashboard.js"></script>
+    <script>
+        // Mobile menu functionality
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileCloseBtn = document.getElementById('mobileCloseBtn');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const sidebar = document.getElementById('sidebar');
+
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('mobile-open');
+            mobileOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+        }
+
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        mobileCloseBtn.addEventListener('click', toggleMobileMenu);
+        mobileOverlay.addEventListener('click', toggleMobileMenu);
+
+        // Show/hide mobile close button based on screen size
+        function updateMobileCloseButton() {
+            if (window.innerWidth <= 768) {
+                mobileCloseBtn.style.display = 'block';
+            } else {
+                mobileCloseBtn.style.display = 'none';
+                sidebar.classList.remove('mobile-open');
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Initial check
+        updateMobileCloseButton();
+
+        // Update on resize
+        window.addEventListener('resize', updateMobileCloseButton);
+
+        // Navigation between sections
+        const navItems = document.querySelectorAll('.nav-item[data-section]');
+        const sections = {
+            dashboard: document.getElementById('upcomingEvents'),
+            profile: document.getElementById('profileSection'),
+            'special-dates': document.getElementById('specialDatesSection'),
+            'next-of-kin': document.getElementById('nextOfKinSection'),
+            reminders: document.getElementById('remindersSection'),
+            settings: document.getElementById('settingsSection')
+        };
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const sectionId = this.getAttribute('data-section');
+
+                // Update active nav item
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Hide all sections
+                Object.values(sections).forEach(section => {
+                    if (section) section.style.display = 'none';
+                });
+
+                // Show selected section
+                if (sections[sectionId]) {
+                    sections[sectionId].style.display = 'block';
+                }
+
+                // Update page title
+                const pageTitle = document.getElementById('pageTitle');
+                const pageSubtitle = document.getElementById('pageSubtitle');
+
+                switch (sectionId) {
+                    case 'dashboard':
+                        pageTitle.textContent = 'Dashboard Overview';
+                        pageSubtitle.textContent = 'Welcome to your welfare management dashboard';
+                        break;
+                    case 'profile':
+                        pageTitle.textContent = 'My Profile';
+                        pageSubtitle.textContent = 'View and manage your personal information';
+                        break;
+                    case 'special-dates':
+                        pageTitle.textContent = 'Special Dates';
+                        pageSubtitle.textContent = 'Manage your birthdays, anniversaries, and other special dates';
+                        break;
+                    case 'next-of-kin':
+                        pageTitle.textContent = 'Next of Kin';
+                        pageSubtitle.textContent = 'Manage your emergency contacts';
+                        break;
+                    case 'reminders':
+                        pageTitle.textContent = 'Reminders';
+                        pageSubtitle.textContent = 'Configure your reminder settings';
+                        break;
+                    case 'settings':
+                        pageTitle.textContent = 'Settings';
+                        pageSubtitle.textContent = 'Manage your account preferences';
+                        break;
+                }
+
+                // Close mobile menu on mobile after selection
+                if (window.innerWidth <= 768) {
+                    toggleMobileMenu();
+                }
+            });
+        });
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('psn_welfare_token');
+                localStorage.removeItem('psn_welfare_user');
+                window.location.href = '../pages/login.html';
+            }
+        });
+
+        // Modal functionality
+        const modals = document.querySelectorAll('.modal');
+        const modalCloseButtons = document.querySelectorAll('.modal-close');
+        const cancelButtons = document.querySelectorAll('[id$="Btn"]:not(#logoutBtn)');
+
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Open modals
+        document.getElementById('addDateBtn')?.addEventListener('click', () => openModal('addDateModal'));
+        document.getElementById('addNextKinBtn')?.addEventListener('click', () => openModal('addKinModal'));
+        document.getElementById('addNewDateBtn')?.addEventListener('click', () => openModal('addDateModal'));
+        document.getElementById('addFirstDateBtn')?.addEventListener('click', () => openModal('addDateModal'));
+        document.getElementById('addKinBtn')?.addEventListener('click', () => openModal('addKinModal'));
+        document.getElementById('editProfileBtn')?.addEventListener('click', () => openModal('editProfileModal'));
+        document.getElementById('viewConsentBtn')?.addEventListener('click', () => alert('Consent document would open here'));
+        document.getElementById('requestDeletionBtn')?.addEventListener('click', () => {
+            if (confirm('Are you sure you want to request account deletion? This action cannot be undone.')) {
+                alert('Account deletion request submitted. Admin will contact you shortly.');
+            }
+        });
+        document.getElementById('exportDataBtn')?.addEventListener('click', () => {
+            alert('Data export initiated. You will receive an email with your data shortly.');
+        });
+        document.getElementById('changePasswordBtn')?.addEventListener('click', () => openModal('editProfileModal'));
+
+        // Close modals
+        modalCloseButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const modal = this.closest('.modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        cancelButtons.forEach(btn => {
+            if (btn.id.includes('cancel') || btn.id.includes('Cancel')) {
+                btn.addEventListener('click', function () {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function (e) {
+            modals.forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // Form submissions
+        document.getElementById('saveDateBtn')?.addEventListener('click', function () {
+            const dateLabel = document.getElementById('dateLabel').value;
+            const eventDate = document.getElementById('eventDate').value;
+
+            if (!dateLabel || !eventDate) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Here you would typically save to backend
+            alert(`Date "${dateLabel}" on ${eventDate} saved successfully!`);
+            closeModal('addDateModal');
+            document.getElementById('addDateForm').reset();
+        });
+
+        document.getElementById('saveKinBtn')?.addEventListener('click', function () {
+            const kinName = document.getElementById('kinName').value;
+            const kinRelationship = document.getElementById('kinRelationship').value;
+            const kinPhone = document.getElementById('kinPhone').value;
+
+            if (!kinName || !kinRelationship || !kinPhone) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Here you would typically save to backend
+            alert(`Next of kin "${kinName}" saved successfully!`);
+            closeModal('addKinModal');
+            document.getElementById('addKinForm').reset();
+        });
+
+        // Initialize with dashboard section
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if user is logged in
+            const token = localStorage.getItem('psn_welfare_token');
+            const user = localStorage.getItem('psn_welfare_user');
+
+            if (!token || !user) {
+                window.location.href = '../pages/login.html';
+                return;
+            }
+
+            try {
+                const userData = JSON.parse(user);
+                document.getElementById('userName').textContent = userData.fullName || 'Member';
+                document.getElementById('userPsn').textContent = userData.psnNumber || 'PSN-XXXX-XXXX';
+
+                document.getElementById('profileName').textContent = userData.fullName || 'Dr. John Pharmacist';
+                document.getElementById('profilePsn').textContent = userData.psnNumber || 'PSN-TARA-2023-001';
+                document.getElementById('profileEmail').textContent = userData.email || 'john.pharmacist@example.com';
+                document.getElementById('profilePhone').textContent = userData.phone || '0803 123 4567';
+
+                // Set current date as default for date inputs
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('eventDate').value = today;
+                document.getElementById('editDateOfBirth').value = '1985-05-15';
+                document.getElementById('editWeddingDate').value = '2015-06-22';
+
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+
+            // Show dashboard section by default
+            sections.dashboard.style.display = 'block';
+        });
+    </script>
 </body>
 
 </html>
