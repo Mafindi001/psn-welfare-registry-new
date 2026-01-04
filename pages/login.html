@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PSN Taraba Welfare Registry</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Fallback inline styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .auth-header {
+            background: #2c5aa0;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .auth-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background: #2c5aa0;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-block {
+            width: 100%;
+            padding: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h2>Member Login</h2>
+                <p>Pharmaceutical Society of Nigeria, Taraba State Chapter</p>
+            </div>
+
+            <div class="auth-body">
+                <a href="/index.html" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+
+                <!-- Messages -->
+                <div class="alert alert-success" id="successAlert" style="display: none;">
+                    Login successful! Redirecting...
+                </div>
+
+                <div class="alert alert-error" id="errorAlert" style="display: none;">
+                    Invalid credentials. Please try again.
+                </div>
+
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginPsn">PSN Number or Email <span class="required">*</span></label>
+                        <input type="text" id="loginPsn" class="form-control" placeholder="Enter PSN number or email"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Password <span class="required">*</span></label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password"
+                            required>
+                        <div class="form-text">
+                            <a href="#forgot" id="forgotPassword">Forgot password?</a>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="consent-group">
+                            <input type="checkbox" id="rememberMe">
+                            <div class="consent-text">
+                                <label for="rememberMe">Remember me on this device</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+                            <i class="fas fa-sign-in-alt"></i> Login to Account
+                        </button>
+                    </div>
+                </form>
+
+                <div class="auth-footer">
+                    Don't have an account? <a href="/pages/register.html">Register here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/scripts/utils.js"></script>
+    <script src="/scripts/api.js"></script>
+
+    ript src="/scripts/utils.js"></script>
+    <script src="/scripts/api.js"></script>
+
+    <script>
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const successAlert = document.getElementById('successAlert');
+        const errorAlert = document.getElementById('errorAlert');
+        const forgotPasswordLink = document.getElementById('forgotPassword');
+
+        // Check if already logged in (prevent login page access if authenticated)
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('psn_welfare_token');
+            const user = localStorage.getItem('psn_welfare_user');
+
+            console.log('Login page loaded. Checking auth:', { token, user });
+
+            if (token && user) {
+                console.log('Already logged in, redirecting to dashboard');
+                // Check if user is admin
+                try {
+                    const userObj = JSON.parse(user);
+                    if (userObj.isAdmin) {
+                        window.location.href = '/pages/admin.html';
+                    } else {
+                        window.location.href = '/pages/dashboard.html';
+                    }
+                } catch {
+                    window.location.href = '/pages/dashboard.html';
+                }
+            }
+
+            // Auto-fill demo credentials for testing (only on localhost)
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                document.getElementById('loginPsn').value = 'PSN-TARA-2023-001';
+                document.getElementById('loginPassword').value = 'Password123!';
+            }
+        });
+
+        // Handle form submission
+        async function handleLogin(event) {
+            event.preventDefault();
+            console.log('Login form submitted');
+
+            const psnOrEmail = document.getElementById('loginPsn').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            // Basic validation
+            if (!psnOrEmail || !password) {
+                showError('Please enter both PSN/Email and password');
+                return;
+            }
+
+            // Show loading
+            loginBtn.classList.add('btn-loading');
+            loginBtn.disabled = true;
+            errorAlert.style.display = 'none';
+
+            try {
+                // Simulate API call
+                console.log('Attempting login with:', { psnOrEmail });
+
+                // For demo purposes - accept any credentials
+                // In production, validate against backend
+                const mockUser = {
+                    id: 'user_' + Date.now(),
+                    psnNumber: psnOrEmail.includes('@') ? 'PSN-TARA-2023-001' : psnOrEmail,
+                    fullName: 'Demo Pharmacist',
+                    email: psnOrEmail.includes('@') ? psnOrEmail : 'pharmacist@example.com',
+                    phone: '08031234567',
+                    dateOfBirth: '1985-05-15',
+                    weddingDate: '2015-06-22',
+                    isAdmin: psnOrEmail.toLowerCase().includes('admin'),
+                    consentGiven: true,
+                    consentDate: new Date().toISOString(),
+                    createdAt: new Date().toISOString()
+                };
+
+                // Store in localStorage
+                localStorage.setItem('psn_welfare_token', 'mock_jwt_token_' + Date.now());
+                localStorage.setItem('psn_welfare_user', JSON.stringify(mockUser));
+
+                // Store remember me preference
+                if (rememberMe) {
+                    localStorage.setItem('psn_remember_me', 'true');
+                }
+
+                console.log('Login successful, user stored:', mockUser);
+
+                // Show success
+                successAlert.style.display = 'block';
+                errorAlert.style.display = 'none';
+
+                // Redirect based on role after short delay
+                setTimeout(() => {
+                    if (mockUser.isAdmin) {
+                        console.log('Redirecting to admin dashboard');
+                        window.location.href = '/pages/admin.html';
+                    } else {
+                        console.log('Redirecting to member dashboard');
+                        window.location.href = '/pages/dashboard.html';
+                    }
+                }, 1500);
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Login failed. Please check your credentials.');
+            } finally {
+                loginBtn.classList.remove('btn-loading');
+                loginBtn.disabled = false;
+            }
+        }
+
+        // Helper function to show errors
+        function showError(message) {
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+            successAlert.style.display = 'none';
+        }
+
+        // Forgot password handler
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Password reset feature will be available soon. Please contact the Welfare Secretary.');
+        });
+
+        // Form submit event
+        loginForm.addEventListener('submit', handleLogin);
+    </script>
+</body>
+
+</html>

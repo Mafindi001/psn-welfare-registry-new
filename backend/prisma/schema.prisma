@@ -1,0 +1,120 @@
+// Two-Factor Authentication
+model TwoFactorSecret {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  secret            String?   // Base32 encoded secret
+  tempSecret        String?   // Temporary secret during setup
+  tempSecretExpiry  DateTime?
+  enabled           Boolean   @default(false)
+  enabledAt         DateTime?
+  disabledAt        DateTime?
+  disabledBy        String?   // User ID of admin who disabled it
+  
+  // Backup codes
+  backupCodes       TwoFactorBackupCode[]
+  
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  member            Member    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("two_factor_secrets")
+}
+
+model TwoFactorBackupCode {
+  id                String    @id @default(cuid())
+  userId            String
+  codeHash          String    // Hashed backup code
+  used              Boolean   @default(false)
+  usedAt            DateTime?
+  
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  
+  // Relations
+  member            Member    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("two_factor_backup_codes")
+}
+
+model TwoFactorSmsCode {
+  id                String    @id @default(cuid())
+  userId            String
+  phoneNumber       String
+  code              String
+  used              Boolean   @default(false)
+  usedAt            DateTime?
+  expiresAt         DateTime
+  
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  
+  // Relations
+  member            Member    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("two_factor_sms_codes")
+}
+
+// IP Whitelisting
+model IPWhitelist {
+  id                String    @id @default(cuid())
+  ipAddress         String    @unique
+  isAdminIP         Boolean   @default(false)
+  notes             String?
+  enabled           Boolean   @default(true)
+  
+  // Audit fields
+  addedBy           String?
+  updatedBy         String?
+  
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  addedByUser       Member?   @relation("AddedIPs", fields: [addedBy], references: [id])
+  updatedByUser     Member?   @relation("UpdatedIPs", fields: [updatedBy], references: [id])
+  
+  @@map("ip_whitelist")
+}
+
+// Security Events
+model SecurityEvent {
+  id                String    @id @default(cuid())
+  eventType         String    // LOGIN_ATTEMPT, PASSWORD_RESET, 2FA_FAILED, etc.
+  userId            String?
+  ipAddress         String
+  userAgent         String?
+  success           Boolean
+  details           Json?
+  
+  // Timestamps
+  timestamp         DateTime  @default(now())
+  
+  // Relations
+  member            Member?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@map("security_events")
+}
+
+// Update Member model
+model Member {
+  // ... existing fields ...
+  
+  // Security fields
+  requires2FA       Boolean   @default(false)
+  lastPasswordChange DateTime?
+  failedLoginAttempts Int     @default(0)
+  accountLocked     Boolean   @default(false)
+  lockedUntil       DateTime?
+  
+  // Security relations
+  twoFactorSecret   TwoFactorSecret?
+  securityEvents    SecurityEvent[]
+  addedIPs          IPWhitelist[]    @relation("AddedIPs")
+  updatedIPs        IPWhitelist[]    @relation("UpdatedIPs")
+  
+  // ... rest of model ...
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSN Taraba Announcement: {{title}}</title>
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5aa0, #1e3a6e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .content {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .psn-badge {
+            display: inline-block;
+            background: #34a853;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #2c5aa0, #4a7bc9);
+            color: white;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 25px 0;
+            font-weight: 600;
+        }
+
+        .important-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="psn-badge">PSN TARABA STATE CHAPTER</div>
+        <h1 style="margin: 10px 0;">Official Announcement</h1>
+        <p style="opacity: 0.9; margin: 0;">Welfare Secretary's Office</p>
+    </div>
+
+    <div class="content">
+        <h2 style="color: #2c5aa0; margin-top: 0;">{{title}}</h2>
+
+        <p style="font-size: 14px; color: #666; margin-bottom: 30px;">
+            <strong>Date:</strong> {{date}}<br>
+            <strong>Reference:</strong> {{reference}}
+        </p>
+
+        <div style="font-size: 16px; line-height: 1.8;">
+            {{{content}}}
+        </div>
+
+        {{#if actionUrl}}
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{actionUrl}}" class="button">
+                {{actionText}}
+            </a>
+        </div>
+        {{/if}}
+
+        {{#if importantNote}}
+        <div class="important-note">
+            <strong>Important Note:</strong> {{importantNote}}
+        </div>
+        {{/if}}
+
+        <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            <p style="margin: 0; font-size: 14px;">
+                <strong>Contact for Inquiries:</strong><br>
+                Welfare Secretary - {{contactName}}<br>
+                Email: {{contactEmail}}<br>
+                Phone: {{contactPhone}}
+            </p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Pharmaceutical Society of Nigeria - Taraba State Chapter</p>
+        <p>Welfare Digital Registry System</p>
+        <p>This is an official communication. Please do not reply to this automated email.</p>
+        <p>© {{year}} PSN Taraba. All rights reserved.</p>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - PSN Taraba Welfare Registry</title>
+    <!-- Use root-relative paths -->
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Add inline styles as fallback -->
+    <style>
+        /* Temporary styles in case CSS doesn't load */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: #2c5aa0;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .auth-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .auth-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #2c5aa0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-block {
+            width: 100%;
+            padding: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h2>Member Registration</h2>
+                <p>Pharmaceutical Society of Nigeria, Taraba State Chapter</p>
+            </div>
+
+            <div class="auth-body">
+                <a href="../index.html" class="back-home">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+
+                <!-- Success/Error Messages -->
+                <div class="alert alert-success" id="successAlert">
+                    Registration successful! Redirecting to login...
+                </div>
+
+                <div class="alert alert-error" id="errorAlert">
+                    Please check the form for errors.
+                </div>
+
+                <form id="registerForm" class="auth-form">
+                    <!-- PSN Membership Details -->
+                    <div class="form-group">
+                        <label for="psnNumber">PSN Membership Number <span class="required">*</span></label>
+                        <input type="text" id="psnNumber" class="form-control" placeholder="e.g., PSN-TARA-2023-001"
+                            required>
+                        <div class="form-text">
+                            Enter your official PSN membership number
+                        </div>
+                    </div>
+
+                    <!-- Personal Information -->
+                    <div class="form-group">
+                        <label for="fullName">Full Name <span class="required">*</span></label>
+                        <input type="text" id="fullName" class="form-control" placeholder="Enter your full name"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" class="form-control" placeholder="your.email@example.com"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" class="form-control" placeholder="0803XXXXXXX" required>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password">Password <span class="required">*</span></label>
+                        <input type="password" id="password" class="form-control" placeholder="Create a strong password"
+                            required minlength="8">
+                        <div class="password-strength">
+                            <div class="strength-meter">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <div class="strength-text" id="strengthText">Password strength</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
+                        <input type="password" id="confirmPassword" class="form-control"
+                            placeholder="Re-enter your password" required>
+                        <div class="form-text error" id="passwordError"></div>
+                    </div>
+
+                    <!-- Special Dates -->
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weddingDate">Wedding Anniversary (if applicable)</label>
+                        <input type="date" id="weddingDate" class="form-control">
+                    </div>
+
+                    <!-- Data Protection Consent -->
+                    <div class="consent-group">
+                        <input type="checkbox" id="consent" name="consent" required>
+                        <div class="consent-text">
+                            <label for="consent">
+                                I hereby give my consent to the Pharmaceutical Society of Nigeria,
+                                Taraba State Chapter to process my personal data for welfare purposes
+                                in accordance with the Nigeria Data Protection Act (NDPA).
+                                I understand that I can withdraw this consent at any time by
+                                contacting the Welfare Secretary.
+                                <span class="required">*</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                            <i class="fas fa-user-plus"></i> Register Account
+                        </button>
+                    </div>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="login.html">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link to utility scripts -->
+    <script src="../scripts/utils.js"></script>
+    <script src="../scripts/api.js"></script>
+
+    <!-- Registration-specific script -->
+    <script>
+        // DOM Elements
+        const registerForm = document.getElementById('registerForm');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        const passwordError = document.getElementById('passwordError');
+        const submitBtn = document.getElementById('submitBtn');
+        const successAlert = document.getElementById('successAlert');
+        const errorAlert = document.getElementById('errorAlert');
+
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let strength = 0;
+
+            // Length check
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+
+            // Complexity checks
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            // Update UI
+            const strengthClasses = ['strength-weak', 'strength-fair', 'strength-good', 'strength-strong', 'strength-strong'];
+            const strengthLabels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+
+            strengthFill.className = 'strength-fill ' + (strengthClasses[strength] || 'strength-weak');
+            strengthText.textContent = 'Password strength: ' + (strengthLabels[strength] || 'Very Weak');
+            strengthText.style.color = strength >= 3 ? '#2ecc71' : strength >= 2 ? '#3498db' : '#e74c3c';
+        }
+
+        // Validate password match
+        function validatePasswordMatch() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (confirmPassword && password !== confirmPassword) {
+                passwordError.textContent = 'Passwords do not match';
+                confirmPasswordInput.classList.add('error');
+                return false;
+            } else {
+                passwordError.textContent = '';
+                confirmPasswordInput.classList.remove('error');
+                return true;
+            }
+        }
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+
+            // Clear previous errors
+            document.querySelectorAll('.form-control.error').forEach(el => {
+                el.classList.remove('error');
+            });
+
+            // Required fields check
+            const requiredFields = registerForm.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('error');
+                    isValid = false;
+                }
+            });
+
+            // Password validation
+            if (!validatePasswordMatch()) {
+                isValid = false;
+            }
+
+            // Email validation
+            const emailField = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailField.value && !emailRegex.test(emailField.value)) {
+                emailField.classList.add('error');
+                isValid = false;
+            }
+
+            // Consent check
+            const consentCheckbox = document.getElementById('consent');
+            if (!consentCheckbox.checked) {
+                consentCheckbox.parentElement.parentElement.style.borderColor = '#e74c3c';
+                isValid = false;
+            } else {
+                consentCheckbox.parentElement.parentElement.style.borderColor = '';
+            }
+
+            return isValid;
+        }
+
+        // Handle form submission
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            if (!validateForm()) {
+                errorAlert.textContent = 'Please fill in all required fields correctly.';
+                errorAlert.classList.add('show');
+                return;
+            }
+
+            // Prepare form data
+            const formData = {
+                psnNumber: document.getElementById('psnNumber').value.trim(),
+                fullName: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                password: passwordInput.value,
+                dateOfBirth: document.getElementById('dateOfBirth').value || null,
+                weddingDate: document.getElementById('weddingDate').value || null,
+                consentGiven: true,
+                consentDate: new Date().toISOString()
+            };
+
+            // Show loading state
+            submitBtn.classList.add('btn-loading');
+            submitBtn.disabled = true;
+
+            try {
+                // For now, simulate API call
+                // In production, replace with: const response = await api.register(formData);
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Show success
+                successAlert.classList.add('show');
+                errorAlert.classList.remove('show');
+
+                // Reset form
+                registerForm.reset();
+                strengthFill.className = 'strength-fill';
+                strengthText.textContent = 'Password strength';
+
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+
+            } catch (error) {
+                errorAlert.textContent = error.message || 'Registration failed. Please try again.';
+                errorAlert.classList.add('show');
+                successAlert.classList.remove('show');
+            } finally {
+                submitBtn.classList.remove('btn-loading');
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Event Listeners
+        passwordInput.addEventListener('input', () => {
+            checkPasswordStrength(passwordInput.value);
+            validatePasswordMatch();
+        });
+
+        confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+
+        registerForm.addEventListener('submit', handleSubmit);
+
+        // Real-time validation for required fields
+        registerForm.querySelectorAll('[required]').forEach(field => {
+            field.addEventListener('blur', () => {
+                if (!field.value.trim()) {
+                    field.classList.add('error');
+                } else {
+                    field.classList.remove('error');
+                }
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set max date for date inputs to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateOfBirth').max = today;
+            document.getElementById('weddingDate').max = today;
+        });
+    </script>
+</body>
+
+</html>

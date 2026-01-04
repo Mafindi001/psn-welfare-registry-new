@@ -1,0 +1,21 @@
+# Prisma
+prisma/migrations/
+!prisma/migrations/.gitkeep
+
+# Uploads
+uploads/
+reports/
+
+# Email templates (development)
+emails/
+
+# Database backups
+*.sql
+*.dump
+
+# Sensitive files
+config/local.js
+config/secret.js
+
+# Docker
+.dockerignore

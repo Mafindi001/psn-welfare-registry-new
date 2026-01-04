@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSN Taraba - Welfare Digital Registry</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/auth.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Inline Styles for Critical Elements -->
+    <style>
+        /* Critical styles for immediate rendering */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background: #2c5aa0;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-placeholder {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2c5aa0;
+            font-size: 1.5rem;
+        }
+
+        .brand-text h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .brand-text p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background: #ff6b35;
+            color: white;
+            border-color: #ff6b35;
+        }
+
+        .btn-primary:hover {
+            background: #e55a2b;
+            border-color: #e55a2b;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border-color: white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #2c5aa0;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border-color: white;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hero {
+            padding: 4rem 1rem;
+            background: linear-gradient(135deg, #2c5aa0 0%, #1a3a6e 100%);
+            color: white;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        .dashboard-preview {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .preview-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.red {
+            background: #ff5f56;
+        }
+
+        .dot.yellow {
+            background: #ffbd2e;
+        }
+
+        .dot.green {
+            background: #27ca3f;
+        }
+
+        .preview-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .preview-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .preview-item i {
+            color: #2c5aa0;
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-actions {
+                justify-content: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-links.show {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #2c5aa0;
+                padding: 1rem;
+                z-index: 1000;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="logo-placeholder">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>PSN Taraba</h1>
+                    <p>Welfare Digital Registry</p>
+                </div>
+            </div>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="nav-links" id="navLinks">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#contact" class="nav-link">Contact</a>
+
+                <!-- Dynamic Login/Logout Links - Will be populated by JavaScript -->
+                <div id="authLinks"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h2 class="hero-title">Professional Welfare Management for Taraba Pharmacists</h2>
+                <p class="hero-subtitle">
+                    A secure digital registry for PSN Taraba members to manage welfare information,
+                    celebrate special occasions, and strengthen our professional community.
+                </p>
+                <div class="hero-actions">
+                    <a href="pages/register.html" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus"></i> Register as Member
+                    </a>
+                    <a href="pages/login.html" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Member Login
+                    </a>
+                    <a href="pages/admin-login.html" class="btn btn-outline btn-lg">
+                        <i class="fas fa-user-shield"></i> Admin Login
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="dashboard-preview">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <p>PSN Welfare Dashboard</p>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-item">
+                            <i class="fas fa-birthday-cake"></i>
+                            <span>Birthday Reminders</span>
+                        </div>
+                        <div class="preview-item">
+                            <i class="fas fa-ring"></i>
+                            <span>Anniversary Tracking</span>
+                        </div>
+                        <div class="preview-item">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Secure Profile</span>
+                        </div>
+                        <div class="preview-item">
+                            <i class="fas fa-bell"></i>
+                            <span>24-Hour Notifications</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Platform Features</h2>
+            <p class="section-subtitle">Designed with pharmacists' welfare in mind</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>NDPA Compliant</h3>
+                    <p>Built in compliance with Nigeria Data Protection Act. Your data is secure and private.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>Automated Reminders</h3>
+                    <p>Get email notifications 24 hours before special dates. Never miss an important celebration.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Next-of-Kin Management</h3>
+                    <p>Securely store emergency contact information for welfare purposes.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Admin Dashboard</h3>
+                    <p>Welfare officers can monitor celebrations and generate reports for planning.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="section-title">About This Initiative</h2>
+                <p class="about-text">
+                    The Pharmaceutical Society of Nigeria (PSN), Taraba State Chapter, is launching this
+                    Digital Welfare Registry to enhance member welfare services. As part of the Welfare
+                    Secretary's mandate, this platform ensures:
+                </p>
+                <ul class="about-list">
+                    <li><i class="fas fa-check-circle"></i> Professional management of member data</li>
+                    <li><i class="fas fa-check-circle"></i> Timely celebration of special occasions</li>
+                    <li><i class="fas fa-check-circle"></i> Transparent and auditable welfare processes</li>
+                    <li><i class="fas fa-check-circle"></i> Secure, member-controlled information</li>
+                    <li><i class="fas fa-check-circle"></i> Compliance with data protection regulations</li>
+                </ul>
+                <div class="about-note">
+                    <i class="fas fa-info-circle"></i>
+                    <p>This platform is officially endorsed by the PSN Taraba State Executive Council.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>PSN Taraba Welfare Registry</h3>
+                    <p>Strengthening our professional community through digital innovation.</p>
+                    <p class="footer-contact">
+                        <i class="fas fa-envelope"></i> welfare@psntaraba.org.ng
+                    </p>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="pages/login.html">Member Login</a>
+                    <a href="pages/admin-login.html">Admin Login</a>
+                    <a href="pages/register.html">New Registration</a>
+                    <a href="#privacy" id="privacyLink">Privacy Policy</a>
+                    <a href="#terms" id="termsLink">Terms of Service</a>
+                </div>
+
+                <div class="footer-psn">
+                    <h4>Pharmaceutical Society of Nigeria</h4>
+                    <p>Taraba State Chapter</p>
+                    <p>Welfare Secretary's Office</p>
+                    <p class="copyright">
+                        &copy; <span id="currentYear"></span> PSN Taraba. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Privacy Modal -->
+    <div class="modal" id="privacyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Privacy Policy</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>This PSN Welfare Digital Registry complies with the Nigeria Data Protection Act (NDPA).</p>
+                <p><strong>Data Collection:</strong> We collect only necessary information for welfare purposes.</p>
+                <p><strong>Data Usage:</strong> Your information is used exclusively for PSN Taraba welfare activities.
+                </p>
+                <p><strong>Consent:</strong> Registration requires explicit consent for data processing.</p>
+                <p><strong>Security:</strong> Industry-standard encryption protects your data.</p>
+                <p><strong>Your Rights:</strong> You can access, correct, or request deletion of your data.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+
+        if (mobileMenuBtn && navLinks) {
+            mobileMenuBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('show');
+            });
+        }
+
+        // Privacy modal
+        const privacyLink = document.getElementById('privacyLink');
+        const privacyModal = document.getElementById('privacyModal');
+        const modalClose = document.querySelector('.modal-close');
+
+        if (privacyLink && privacyModal) {
+            privacyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                privacyModal.style.display = 'block';
+            });
+        }
+
+        if (modalClose) {
+            modalClose.addEventListener('click', () => {
+                privacyModal.style.display = 'none';
+            });
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('privacyModal');
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Dynamic Authentication Links
+        function updateAuthLinks() {
+            const authLinksContainer = document.getElementById('authLinks');
+            if (!authLinksContainer) return;
+
+            const token = localStorage.getItem('psn_welfare_token');
+            const userStr = localStorage.getItem('psn_welfare_user');
+
+            let html = '';
+
+            if (token && userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    const isAdmin = user.isAdmin || false;
+
+                    if (isAdmin) {
+                        html = `
+                            <a href="pages/admin.html" class="btn btn-outline">Admin Dashboard</a>
+                            <a href="#" onclick="logout(); return false;" class="btn btn-primary">Logout</a>
+                        `;
+                    } else {
+                        html = `
+                            <a href="pages/dashboard.html" class="btn btn-outline">My Dashboard</a>
+                            <a href="#" onclick="logout(); return false;" class="btn btn-primary">Logout</a>
+                        `;
+                    }
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                    html = `
+                        <a href="pages/login.html" class="btn btn-outline">Member Login</a>
+                        <a href="pages/admin-login.html" class="btn btn-outline">Admin Login</a>
+                        <a href="pages/register.html" class="btn btn-primary">Register</a>
+                    `;
+                }
+            } else {
+                html = `
+                    <a href="pages/login.html" class="btn btn-outline">Member Login</a>
+                    <a href="pages/admin-login.html" class="btn btn-outline">Admin Login</a>
+                    <a href="pages/register.html" class="btn btn-primary">Register</a>
+                `;
+            }
+
+            authLinksContainer.innerHTML = html;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('psn_welfare_token');
+            localStorage.removeItem('psn_welfare_user');
+            localStorage.removeItem('psn_remember_me');
+            window.location.href = 'index.html';
+        }
+
+        // Initialize auth links on page load
+        document.addEventListener('DOMContentLoaded', updateAuthLinks);
+    </script>
+</body>
+
+</html>

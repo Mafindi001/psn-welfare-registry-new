@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PSN Taraba Welfare Registry</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">PSN Taraba</h3>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-light);">Welfare Registry</p>
+                </div>
+            </div>
+
+            <div class="sidebar-user">
+                <p class="user-greeting">Welcome back,</p>
+                <h2 class="user-name" id="userName">Dr. John Pharmacist</h2>
+                <p class="user-psn" id="userPsn">PSN-TARA-2023-001</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#profile" class="nav-item" data-section="profile">
+                    <i class="fas fa-user"></i>
+                    <span>My Profile</span>
+                </a>
+                <a href="#special-dates" class="nav-item" data-section="special-dates">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Special Dates</span>
+                </a>
+                <a href="#next-of-kin" class="nav-item" data-section="next-of-kin">
+                    <i class="fas fa-users"></i>
+                    <span>Next of Kin</span>
+                </a>
+                <a href="#reminders" class="nav-item" data-section="reminders">
+                    <i class="fas fa-bell"></i>
+                    <span>Reminders</span>
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <!-- Header with Mobile Menu Toggle -->
+            <header class="dashboard-header">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="header-title">
+                    <h1 id="pageTitle">Dashboard Overview</h1>
+                    <p id="pageSubtitle" style="color: var(--text-light); margin: 0.5rem 0 0; font-size: 0.95rem;">
+                        Welcome to your welfare management dashboard
+                    </p>
+                </div>
+
+                <div class="header-actions">
+                    <button class="btn btn-outline" id="addDateBtn">
+                        <i class="fas fa-plus"></i> Add Special Date
+                    </button>
+                    <button class="btn btn-primary" id="addNextKinBtn">
+                        <i class="fas fa-user-plus"></i> Add Next of Kin
+                    </button>
+                </div>
+            </header>
+
+            <!-- Stats Overview -->
+            <section class="stats-grid" id="statsSection">
+                <div class="stat-card">
+                    <div class="stat-icon birthday">
+                        <i class="fas fa-birthday-cake"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="birthdayCount">1</h3>
+                        <p>Birthdays</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon anniversary">
+                        <i class="fas fa-ring"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="anniversaryCount">1</h3>
+                        <p>Anniversaries</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon upcoming">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="upcomingCount">3</h3>
+                        <p>Upcoming Events</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon profile">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="profileComplete">85%</h3>
+                        <p>Profile Complete</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upcoming Events Section -->
+            <section class="dashboard-section" id="upcomingEvents">
+                <div class="section-header">
+                    <h2>Upcoming Events</h2>
+                    <button class="btn btn-outline" id="viewAllEvents">
+                        <i class="fas fa-calendar"></i> View Calendar
+                    </button>
+                </div>
+
+                <div class="events-grid" id="eventsGrid">
+                    <!-- Events will be loaded here dynamically -->
+                    <div class="event-card upcoming">
+                        <div class="event-header">
+                            <h3 class="event-title">Birthday</h3>
+                            <span class="event-date">15 May 2024</span>
+                        </div>
+                        <p class="event-days">In <span class="highlight">45 days</span></p>
+                        <p>Annual reminder enabled</p>
+                        <div class="event-actions">
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-bell-slash"></i> Disable
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="event-card">
+                        <div class="event-header">
+                            <h3 class="event-title">Wedding Anniversary</h3>
+                            <span class="event-date">22 June 2024</span>
+                        </div>
+                        <p class="event-days">In <span class="highlight">83 days</span></p>
+                        <p>Reminder to: You & Next of Kin</p>
+                        <div class="event-actions">
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="event-card today">
+                        <div class="event-header">
+                            <h3 class="event-title">Child's Birthday</h3>
+                            <span class="event-date">Today</span>
+                        </div>
+                        <p class="event-days">Reminder sent yesterday</p>
+                        <p>Annual reminder enabled</p>
+                        <div class="event-actions">
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-check"></i> Mark Celebrated
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Information Section -->
+            <section class="dashboard-section" id="profileSection" style="display: none;">
+                <div class="section-header">
+                    <h2>My Profile Information</h2>
+                    <button class="btn btn-primary" id="editProfileBtn">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Full Name</div>
+                        <div class="info-value" id="profileName">Dr. John Pharmacist</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">PSN Number</div>
+                        <div class="info-value" id="profilePsn">PSN-TARA-2023-001</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Email Address</div>
+                        <div class="info-value" id="profileEmail">john.pharmacist@example.com</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Phone Number</div>
+                        <div class="info-value" id="profilePhone">0803 123 4567</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Date of Birth</div>
+                        <div class="info-value" id="profileDob">15 May 1985</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Wedding Anniversary</div>
+                        <div class="info-value" id="profileWedding">22 June 2015</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Registration Date</div>
+                        <div class="info-value" id="profileRegDate">15 March 2024</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Consent Given</div>
+                        <div class="info-value" id="profileConsent">Yes (15 March 2024)</div>
+                    </div>
+                </div>
+
+                <div class="section-header" style="margin-top: 2rem;">
+                    <h2>Account Security</h2>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Last Login</div>
+                        <div class="info-value" id="lastLogin">Today, 10:30 AM</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Account Status</div>
+                        <div class="info-value">
+                            <span class="date-status status-active">Active</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Password</div>
+                        <div class="info-value">
+                            <button class="btn btn-outline btn-sm" id="changePasswordBtn">
+                                <i class="fas fa-key"></i> Change Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Special Dates Section -->
+            <section class="dashboard-section" id="specialDatesSection" style="display: none;">
+                <div class="section-header">
+                    <h2>My Special Dates</h2>
+                    <button class="btn btn-primary" id="addNewDateBtn">
+                        <i class="fas fa-plus"></i> Add New Date
+                    </button>
+                </div>
+
+                <div class="empty-state" id="noDatesMessage" style="display: none;">
+                    <i class="fas fa-calendar-plus"></i>
+                    <h3>No special dates added yet</h3>
+                    <p>Add your special dates to receive automated reminders</p>
+                    <button class="btn btn-primary" id="addFirstDateBtn">
+                        <i class="fas fa-plus"></i> Add Your First Date
+                    </button>
+                </div>
+
+                <table class="dates-table" id="datesTable">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Annual</th>
+                            <th>Reminders</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="datesTableBody">
+                        <!-- Dates will be loaded dynamically -->
+                        <tr>
+                            <td class="date-label">Birthday</td>
+                            <td class="date-value">15/05/1985</td>
+                            <td><i class="fas fa-check" style="color: var(--secondary-color);"></i></td>
+                            <td>You & Next of Kin</td>
+                            <td><span class="date-status status-active">Active</span></td>
+                            <td>
+                                <button class="btn btn-outline btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Next of Kin Section -->
+            <section class="dashboard-section" id="nextOfKinSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Next of Kin / Emergency Contacts</h2>
+                    <button class="btn btn-primary" id="addKinBtn">
+                        <i class="fas fa-user-plus"></i> Add Contact
+                    </button>
+                </div>
+
+                <div class="nextkin-grid" id="nextkinGrid">
+                    <!-- Next of kin cards will be loaded here -->
+                    <div class="nextkin-card">
+                        <div class="nextkin-header">
+                            <h3 class="nextkin-name">Jane Pharmacist</h3>
+                            <span class="nextkin-relationship">Spouse</span>
+                        </div>
+                        <span class="primary-badge">Primary</span>
+                        <div class="nextkin-details">
+                            <div class="nextkin-detail">
+                                <i class="fas fa-phone"></i>
+                                <span>0803 987 6543</span>
+                            </div>
+                            <div class="nextkin-detail">
+                                <i class="fas fa-envelope"></i>
+                                <span>jane@example.com</span>
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reminders Section -->
+            <section class="dashboard-section" id="remindersSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Reminder Settings</h2>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Email Notifications</div>
+                        <div class="info-value">
+                            <label class="switch">
+                                <input type="checkbox" id="emailNotifications" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span style="margin-left: 1rem;">Enabled</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Reminder Time</div>
+                        <div class="info-value">24 hours before event</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Reminder Recipients</div>
+                        <div class="info-value">You and Primary Next of Kin</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Last Reminder Sent</div>
+                        <div class="info-value">Today, 9:00 AM (Birthday)</div>
+                    </div>
+                </div>
+
+                <div class="section-header" style="margin-top: 2rem;">
+                    <h2>Recent Reminders</h2>
+                </div>
+
+                <table class="dates-table">
+                    <thead>
+                        <tr>
+                            <th>Date Sent</th>
+                            <th>Event</th>
+                            <th>Recipient</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Today, 9:00 AM</td>
+                            <td>Birthday</td>
+                            <td>You & Next of Kin</td>
+                            <td><span class="date-status status-active">Sent</span></td>
+                        </tr>
+                        <tr>
+                            <td>15 March, 10:30 AM</td>
+                            <td>Welcome Reminder</td>
+                            <td>You</td>
+                            <td><span class="date-status status-active">Sent</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Settings Section -->
+            <section class="dashboard-section" id="settingsSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Account Settings</h2>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Data Sharing Consent</div>
+                        <div class="info-value">
+                            <p style="margin: 0 0 1rem;">You have consented to data processing for welfare purposes.</p>
+                            <button class="btn btn-outline" id="viewConsentBtn">
+                                <i class="fas fa-file-contract"></i> View Consent
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Account Deletion</div>
+                        <div class="info-value">
+                            <p style="margin: 0 0 1rem;">You can request account deletion. This will remove all your
+                                data from the system.</p>
+                            <button class="btn btn-outline" id="requestDeletionBtn">
+                                <i class="fas fa-trash"></i> Request Deletion
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Data Export</div>
+                        <div class="info-value">
+                            <p style="margin: 0 0 1rem;">Download a copy of all your data stored in the system.</p>
+                            <button class="btn btn-primary" id="exportDataBtn">
+                                <i class="fas fa-download"></i> Export My Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Special Date Modal -->
+    <div class="modal" id="addDateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Special Date</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addDateForm">
+                    <div class="form-group">
+                        <label for="dateLabel">Event Label <span class="required">*</span></label>
+                        <input type="text" id="dateLabel" class="form-control"
+                            placeholder="e.g., Birthday, Anniversary, Child's Birthday" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventDate">Date <span class="required">*</span></label>
+                        <input type="date" id="eventDate" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="consent-group">
+                            <input type="checkbox" id="isAnnual" checked>
+                            <div class="consent-text">
+                                <label for="isAnnual">Repeat annually (send reminder every year)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Send reminders to:</label>
+                        <div class="consent-group">
+                            <input type="checkbox" id="remindMember" checked>
+                            <div class="consent-text">
+                                <label for="remindMember">Me (the member)</label>
+                            </div>
+                        </div>
+                        <div class="consent-group">
+                            <input type="checkbox" id="remindNextKin" checked>
+                            <div class="consent-text">
+                                <label for="remindNextKin">Primary next of kin</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelDateBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveDateBtn">Save Date</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Next of Kin Modal -->
+    <div class="modal" id="addKinModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Next of Kin</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addKinForm">
+                    <div class="form-group">
+                        <label for="kinName">Full Name <span class="required">*</span></label>
+                        <input type="text" id="kinName" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kinRelationship">Relationship <span class="required">*</span></label>
+                        <select id="kinRelationship" class="form-control" required>
+                            <option value="">Select relationship</option>
+                            <option value="Spouse">Spouse</option>
+                            <option value="Child">Child</option>
+                            <option value="Parent">Parent</option>
+                            <option value="Sibling">Sibling</option>
+                            <option value="Other Relative">Other Relative</option>
+                            <option value="Friend">Friend</option>
+                            <option value="Colleague">Colleague</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kinPhone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="kinPhone" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kinEmail">Email Address</label>
+                        <input type="email" id="kinEmail" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="consent-group">
+                            <input type="checkbox" id="isPrimaryKin">
+                            <div class="consent-text">
+                                <label for="isPrimaryKin">Set as primary emergency contact</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelKinBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveKinBtn">Save Contact</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/scripts/utils.js"></script>
+    <script src="/scripts/api.js"></script>
+    <script src="/scripts/dashboard.js"></script>
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>Edit Profile Information</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-user"></i> Personal Information</h4>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editFullName">Full Name <span class="required">*</span></label>
+                                <input type="text" id="editFullName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editPsnNumber">PSN Number</label>
+                                <input type="text" id="editPsnNumber" class="form-control" disabled>
+                                <div class="form-text">PSN number cannot be changed</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editEmail">Email Address <span class="required">*</span></label>
+                                <input type="email" id="editEmail" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editPhone">Phone Number <span class="required">*</span></label>
+                                <input type="tel" id="editPhone" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Special Dates Section -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-calendar-alt"></i> Special Dates</h4>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editDateOfBirth">Date of Birth</label>
+                                <input type="date" id="editDateOfBirth" class="form-control">
+                                <div class="form-text">Used for birthday reminders</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="editWeddingDate">Wedding Anniversary</label>
+                                <input type="date" id="editWeddingDate" class="form-control">
+                                <div class="form-text">Used for anniversary reminders</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Contacts Section -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-users"></i> Next of Kin / Emergency Contacts</h4>
+                        <div id="nextOfKinContainer">
+                            <!-- Next of kin will be dynamically added here -->
+                        </div>
+                        <button type="button" class="btn btn-outline btn-sm" id="addNextOfKinBtn">
+                            <i class="fas fa-user-plus"></i> Add Another Contact
+                        </button>
+                    </div>
+
+                    <!-- Privacy & Consent Section -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-shield-alt"></i> Privacy Settings</h4>
+
+                        <div class="form-group">
+                            <div class="consent-group">
+                                <input type="checkbox" id="editConsent" name="consent">
+                                <div class="consent-text">
+                                    <label for="editConsent">
+                                        I consent to the processing of my personal data for welfare purposes
+                                        in accordance with the Nigeria Data Protection Act (NDPA).
+                                        I understand that I can withdraw this consent at any time.
+                                        <span class="required">*</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="consent-group">
+                                <input type="checkbox" id="emailNotifications" name="emailNotifications">
+                                <div class="consent-text">
+                                    <label for="emailNotifications">
+                                        Receive email notifications for special date reminders
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="consent-group">
+                                <input type="checkbox" id="nextOfKinNotifications" name="nextOfKinNotifications">
+                                <div class="consent-text">
+                                    <label for="nextOfKinNotifications">
+                                        Send reminders to my next of kin for special dates
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Change Password Section -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-key"></i> Change Password</h4>
+
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" class="form-control">
+                            <div class="form-text">Required only if changing password</div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" class="form-control">
+                                <div class="password-strength">
+                                    <div class="strength-meter">
+                                        <div class="strength-fill" id="passwordStrengthFill"></div>
+                                    </div>
+                                    <div class="strength-text" id="passwordStrengthText">Password strength</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmNewPassword">Confirm New Password</label>
+                                <input type="password" id="confirmNewPassword" class="form-control">
+                                <div class="form-text error" id="passwordMatchError"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelEditProfile">Cancel</button>
+                <button class="btn btn-primary" id="saveProfileBtn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Next of Kin Template (Hidden) -->
+    <template id="nextOfKinTemplate">
+        <div class="next-of-kin-entry">
+            <div class="kin-header">
+                <h5>Emergency Contact</h5>
+                <button type="button" class="btn btn-outline btn-sm remove-kin-btn">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name <span class="required">*</span></label>
+                    <input type="text" class="form-control kin-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Relationship <span class="required">*</span></label>
+                    <select class="form-control kin-relationship" required>
+                        <option value="">Select relationship</option>
+                        <option value="Spouse">Spouse</option>
+                        <option value="Child">Child</option>
+                        <option value="Parent">Parent</option>
+                        <option value="Sibling">Sibling</option>
+                        <option value="Other Relative">Other Relative</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Colleague">Colleague</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone Number <span class="required">*</span></label>
+                    <input type="tel" class="form-control kin-phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control kin-email">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="consent-group">
+                    <input type="checkbox" class="kin-is-primary">
+                    <div class="consent-text">
+                        <label>Set as primary emergency contact</label>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+        </div>
+    </template>
+</body>
+
+</html>

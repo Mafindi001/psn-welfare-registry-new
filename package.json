@@ -1,0 +1,26 @@
+{
+  "name": "psn-welfare-reports",
+  "version": "1.0.0",
+  "description": "PSN Welfare Registry Reports System",
+  "main": "report.js",
+  "scripts": {
+    "dev": "serve .",
+    "build": "echo 'No build required for static site'",
+    "start": "serve .",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "reports",
+    "analytics",
+    "psn",
+    "welfare"
+  ],
+  "author": "PSN Welfare Team",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
