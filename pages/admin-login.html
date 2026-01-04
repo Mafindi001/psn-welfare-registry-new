@@ -571,7 +571,7 @@
                 </div>
 
                 <div class="auth-footer">
-                    Member login? <a href="/login">Click here for member login</a>
+                    Member login? <a href="/pages/login.html">Click here for member login</a>
                 </div>
             </div>
         </div>
@@ -600,7 +600,7 @@
                 try {
                     const userObj = JSON.parse(user);
                     if (userObj.isAdmin) {
-                        window.location.href = 'admin.html';
+                        window.location.href = '/pages/admin.html';
                     }
                 } catch {
                     // Invalid user data, continue with login

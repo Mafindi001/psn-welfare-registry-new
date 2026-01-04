@@ -132,7 +132,7 @@
                 </form>
 
                 <div class="auth-footer">
-                    Don't have an account? <a href="/register">Register here</a>
+                    Don't have an account? <a href="/pages/register.html">Register here</a>
                 </div>
             </div>
         </div>
@@ -165,9 +165,9 @@
                 try {
                     const userObj = JSON.parse(user);
                     if (userObj.isAdmin) {
-                        window.location.href = '/admin';
+                        window.location.href = '/pages/admin.html';
                     } else {
-                        window.location.href = '/dashboard';
+                        window.location.href = '/pages/dashboard.html';
                     }
                 } catch {
                     window.location.href = '/pages/dashboard.html';
@@ -240,10 +240,10 @@
                 setTimeout(() => {
                     if (mockUser.isAdmin) {
                         console.log('Redirecting to admin dashboard');
-                        window.location.href = '/admin';
+                        window.location.href = '/pages/admin.html';
                     } else {
                         console.log('Redirecting to member dashboard');
-                        window.location.href = '/dashboard';
+                        window.location.href = '/pages/dashboard.html';
                     }
                 }, 1500);
 
