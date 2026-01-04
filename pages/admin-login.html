@@ -111,8 +111,7 @@
             font-weight: 500;
             margin-bottom: 1.5rem;
             transition: color 0.3s;
-            min-height: 44px;
-            /* Touch-friendly */
+            min-height: 44px; /* Touch-friendly */
         }
 
         .back-home:hover {
@@ -128,15 +127,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .alert-success {
@@ -178,8 +170,7 @@
             font-size: 1rem;
             font-family: 'Inter', sans-serif;
             transition: border-color 0.3s;
-            min-height: 54px;
-            /* Touch-friendly */
+            min-height: 54px; /* Touch-friendly */
         }
 
         .form-control:focus {
@@ -203,8 +194,7 @@
             text-decoration: none;
             display: inline-block;
             padding: 4px 0;
-            min-height: 44px;
-            /* Touch-friendly */
+            min-height: 44px; /* Touch-friendly */
         }
 
         .form-text a:hover {
@@ -254,8 +244,7 @@
             text-decoration: none;
             text-align: center;
             transition: all 0.3s;
-            min-height: 56px;
-            /* Touch-friendly */
+            min-height: 56px; /* Touch-friendly */
             gap: 8px;
         }
 
@@ -315,8 +304,7 @@
             font-weight: 600;
             display: inline-block;
             padding: 8px 0;
-            min-height: 44px;
-            /* Touch-friendly */
+            min-height: 44px; /* Touch-friendly */
         }
 
         .auth-footer a:hover {
@@ -344,35 +332,35 @@
                 max-width: 95%;
                 margin: 10px;
             }
-
+            
             .admin-body {
                 padding: 1.5rem;
             }
-
+            
             .admin-header {
                 padding: 1.5rem;
             }
-
+            
             .admin-logo {
                 width: 70px;
                 height: 70px;
                 font-size: 1.5rem;
             }
-
+            
             .admin-header h2 {
                 font-size: 1.5rem;
             }
-
+            
             .form-control {
                 padding: 14px 16px;
                 min-height: 50px;
             }
-
+            
             .btn {
                 padding: 14px 24px;
                 min-height: 52px;
             }
-
+            
             .consent-group {
                 padding: 0.75rem;
             }
@@ -385,41 +373,41 @@
                 min-height: 100vh;
                 padding-top: 20px;
             }
-
+            
             .admin-login-box {
                 border-radius: 12px;
             }
-
+            
             .admin-body {
                 padding: 1.25rem;
             }
-
+            
             .admin-header {
                 padding: 1.25rem;
             }
-
+            
             .admin-logo {
                 width: 60px;
                 height: 60px;
                 margin-bottom: 1rem;
             }
-
+            
             .admin-header h2 {
                 font-size: 1.3rem;
             }
-
+            
             .admin-header p {
                 font-size: 0.85rem;
             }
-
+            
             .back-home {
                 font-size: 0.9rem;
             }
-
+            
             .btn {
                 font-size: 0.95rem;
             }
-
+            
             .auth-footer {
                 font-size: 0.9rem;
             }
@@ -429,18 +417,17 @@
             .admin-body {
                 padding: 1rem;
             }
-
+            
             .admin-header {
                 padding: 1rem;
             }
-
+            
             .form-group {
                 margin-bottom: 1.25rem;
             }
-
+            
             .form-control {
-                font-size: 16px;
-                /* Prevents zoom on iOS */
+                font-size: 16px; /* Prevents zoom on iOS */
             }
         }
 
@@ -450,31 +437,31 @@
                 align-items: flex-start;
                 padding: 10px;
             }
-
+            
             .admin-login-container {
                 max-width: 90%;
                 margin: 10px auto;
             }
-
+            
             .admin-header {
                 padding: 1rem;
             }
-
+            
             .admin-body {
                 padding: 1rem;
             }
-
+            
             .admin-logo {
                 width: 50px;
                 height: 50px;
                 margin-bottom: 0.5rem;
             }
-
+            
             .admin-header h2 {
                 font-size: 1.2rem;
                 margin-bottom: 0.25rem;
             }
-
+            
             .form-group {
                 margin-bottom: 1rem;
             }
@@ -485,12 +472,12 @@
             .admin-header {
                 background: #1a3a6e;
             }
-
+            
             .btn-primary {
                 background: #1a3a6e;
                 border: 2px solid white;
             }
-
+            
             .form-control {
                 border-width: 2px;
             }
@@ -503,7 +490,7 @@
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
             }
-
+            
             .btn-primary:hover {
                 transform: none;
             }
@@ -584,7 +571,7 @@
                 </div>
 
                 <div class="auth-footer">
-                    Member login? <a href="login.html">Click here for member login</a>
+                    Member login? <a href="/login">Click here for member login</a>
                 </div>
             </div>
         </div>
@@ -695,7 +682,7 @@
 
                     // Add visual feedback
                     adminLoginForm.classList.add('submitting');
-
+                    
                     // Redirect to admin dashboard after short delay
                     setTimeout(() => {
                         window.location.href = 'admin.html';
@@ -708,13 +695,13 @@
             } catch (error) {
                 console.error('Admin login error:', error);
                 showError('Invalid admin credentials. Please try again.');
-
+                
                 // Add shake animation to form
                 adminLoginForm.classList.add('shake');
                 setTimeout(() => {
                     adminLoginForm.classList.remove('shake');
                 }, 500);
-
+                
                 // Focus back on password field
                 document.getElementById('adminPassword').focus();
             } finally {
@@ -728,7 +715,7 @@
             errorAlert.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
             errorAlert.style.display = 'block';
             successAlert.style.display = 'none';
-
+            
             // Scroll to error if on mobile
             if (window.innerWidth <= 768) {
                 errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -742,7 +729,7 @@
                 const contactInfo = 'For security reasons, please contact the system administrator at:\n\n📞 0800-PSN-TARABA\n📧 admin@psntaraba.org.ng\n\nfor password reset.';
                 alert(contactInfo);
             });
-
+            
             // Also handle Enter key on forgot password link
             forgotPasswordLink.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

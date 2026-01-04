@@ -412,7 +412,7 @@
                     <i class="fas fa-home"></i>
                     <span>Home Page</span>
                 </a>
-                <a href="../pages/admin-login.html" class="nav-item" style="background: rgba(255,255,255,0.1);">
+                <a href="../admin-login" class="nav-item" style="background: rgba(255,255,255,0.1);">
                     <i class="fas fa-user-shield"></i>
                     <span>Admin Login</span>
                 </a>
@@ -1368,7 +1368,7 @@
             if (confirm('Are you sure you want to logout?')) {
                 localStorage.removeItem('psn_welfare_token');
                 localStorage.removeItem('psn_welfare_user');
-                window.location.href = '../pages/login.html';
+                window.location.href = '../login';
             }
         });
 
@@ -1721,7 +1721,7 @@
             const user = localStorage.getItem('psn_welfare_user');
 
             if (!token || !user) {
-                window.location.href = '../pages/login.html';
+                window.location.href = '../login';
                 return;
             }
 

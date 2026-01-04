@@ -1,24 +1,24 @@
 {
-  "name": "psn-welfare-reports",
+  "name": "psn-welfare-registry",
   "version": "1.0.0",
-  "description": "PSN Welfare Registry Reports System",
-  "main": "report.js",
+  "description": "PSN Taraba Welfare Registry System",
+  "main": "index.html",
   "scripts": {
-    "dev": "serve .",
-    "build": "echo 'No build required for static site'",
+    "dev": "vercel dev",
     "start": "serve .",
-    "test": "echo 'No tests specified'"
+    "deploy": "vercel --prod"
   },
   "keywords": [
-    "reports",
-    "analytics",
     "psn",
-    "welfare"
+    "welfare",
+    "registry",
+    "pharmaceutical",
+    "taraba"
   ],
-  "author": "PSN Welfare Team",
+  "author": "PSN Taraba State",
   "license": "MIT",
   "devDependencies": {
-    "serve": "^14.0.0"
+    "vercel": "^28.0.0"
   },
   "engines": {
     "node": ">=16.0.0"

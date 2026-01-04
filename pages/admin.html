@@ -238,7 +238,7 @@
             </nav>
 
             <div class="sidebar-footer">
-                <a href="../pages/dashboard.html" class="btn btn-outline"
+                <a href="../dashboard" class="btn btn-outline"
                     style="margin-bottom: 0.5rem; display: block; text-align: center;">
                     <i class="fas fa-user"></i> Switch to Member View
                 </a>
@@ -1017,19 +1017,19 @@
             const user = localStorage.getItem('psn_welfare_user');
 
             if (!token || !user) {
-                window.location.href = '../pages/admin-login.html';
+                window.location.href = '../admin-login';
                 return false;
             }
 
             try {
                 const userData = JSON.parse(user);
                 if (!userData.isAdmin) {
-                    window.location.href = '../pages/dashboard.html';
+                    window.location.href = '../dashboard';
                     return false;
                 }
                 return true;
             } catch {
-                window.location.href = '../pages/admin-login.html';
+                window.location.href = '../admin-login';
                 return false;
             }
         }
@@ -1596,7 +1596,7 @@
                 if (confirm('Are you sure you want to logout?')) {
                     localStorage.removeItem('psn_welfare_token');
                     localStorage.removeItem('psn_welfare_user');
-                    window.location.href = '../pages/admin-login.html';
+                    window.location.href = '../admin-login';
                 }
             });
 

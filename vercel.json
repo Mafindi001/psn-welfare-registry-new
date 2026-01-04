@@ -6,14 +6,26 @@
             "use": "@vercel/static"
         },
         {
-            "src": "*.js",
+            "src": "pages/*.html",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "api/*.js",
             "use": "@vercel/node"
         }
     ],
     "routes": [
         {
+            "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot))",
+            "dest": "/$1"
+        },
+        {
             "src": "/api/(.*)",
             "dest": "/api/$1"
+        },
+        {
+            "src": "/(login|register|admin|admin-login|dashboard)",
+            "dest": "/pages/$1.html"
         },
         {
             "src": "/(.*)",
@@ -22,5 +34,28 @@
     ],
     "env": {
         "NODE_ENV": "production"
-    }
+    },
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                },
+                {
+                    "key": "X-Frame-Options",
+                    "value": "DENY"
+                },
+                {
+                    "key": "X-XSS-Protection",
+                    "value": "1; mode=block"
+                },
+                {
+                    "key": "Referrer-Policy",
+                    "value": "strict-origin-when-cross-origin"
+                }
+            ]
+        }
+    ]
 }

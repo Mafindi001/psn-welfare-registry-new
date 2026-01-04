@@ -7,8 +7,8 @@
     <title>PSN Taraba - Welfare Digital Registry</title>
 
     <!-- CSS Files -->
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/auth.css">
+    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="/auth.css">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -319,13 +319,13 @@
                     celebrate special occasions, and strengthen our professional community.
                 </p>
                 <div class="hero-actions">
-                    <a href="pages/register.html" class="btn btn-primary btn-lg">
+                    <a href="/register" class="btn btn-primary btn-lg">
                         <i class="fas fa-user-plus"></i> Register as Member
                     </a>
-                    <a href="pages/login.html" class="btn btn-secondary btn-lg">
+                    <a href="/login" class="btn btn-secondary btn-lg">
                         <i class="fas fa-sign-in-alt"></i> Member Login
                     </a>
-                    <a href="pages/admin-login.html" class="btn btn-outline btn-lg">
+                    <a href="/admin-login" class="btn btn-outline btn-lg">
                         <i class="fas fa-user-shield"></i> Admin Login
                     </a>
                 </div>
@@ -444,9 +444,9 @@
 
                 <div class="footer-links">
                     <h4>Quick Links</h4>
-                    <a href="pages/login.html">Member Login</a>
-                    <a href="pages/admin-login.html">Admin Login</a>
-                    <a href="pages/register.html">New Registration</a>
+                    <a href="/login">Member Login</a>
+                    <a href="/admin-login">Admin Login</a>
+                    <a href="/register">New Registration</a>
                     <a href="#privacy" id="privacyLink">Privacy Policy</a>
                     <a href="#terms" id="termsLink">Terms of Service</a>
                 </div>
@@ -540,28 +540,28 @@
 
                     if (isAdmin) {
                         html = `
-                            <a href="pages/admin.html" class="btn btn-outline">Admin Dashboard</a>
+                            <a href="/admin" class="btn btn-outline">Admin Dashboard</a>
                             <a href="#" onclick="logout(); return false;" class="btn btn-primary">Logout</a>
                         `;
                     } else {
                         html = `
-                            <a href="pages/dashboard.html" class="btn btn-outline">My Dashboard</a>
+                            <a href="/dashboard" class="btn btn-outline">My Dashboard</a>
                             <a href="#" onclick="logout(); return false;" class="btn btn-primary">Logout</a>
                         `;
                     }
                 } catch (e) {
                     console.error('Error parsing user data:', e);
                     html = `
-                        <a href="pages/login.html" class="btn btn-outline">Member Login</a>
-                        <a href="pages/admin-login.html" class="btn btn-outline">Admin Login</a>
-                        <a href="pages/register.html" class="btn btn-primary">Register</a>
+                        <a href="/login" class="btn btn-outline">Member Login</a>
+                        <a href="/admin-login" class="btn btn-outline">Admin Login</a>
+                        <a href="/register" class="btn btn-primary">Register</a>
                     `;
                 }
             } else {
                 html = `
-                    <a href="pages/login.html" class="btn btn-outline">Member Login</a>
-                    <a href="pages/admin-login.html" class="btn btn-outline">Admin Login</a>
-                    <a href="pages/register.html" class="btn btn-primary">Register</a>
+                    <a href="/login" class="btn btn-outline">Member Login</a>
+                    <a href="/admin-login" class="btn btn-outline">Admin Login</a>
+                    <a href="/register" class="btn btn-primary">Register</a>
                 `;
             }
 
