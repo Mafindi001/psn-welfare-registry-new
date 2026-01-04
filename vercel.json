@@ -1,5 +1,9 @@
 {
     "version": 2,
+    "buildCommand": null,
+    "outputDirectory": ".",
+    "installCommand": null,
+    "framework": null,
     "builds": [
         {
             "src": "*.html",
@@ -34,6 +38,13 @@
     ],
     "env": {
         "NODE_ENV": "production"
+    },
+    "git": {
+        "deploymentEnabled": {
+            "main": true,
+            "master": true,
+            "develop": true
+        }
     },
     "headers": [
         {
