@@ -6,10 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - PSN Taraba Welfare Registry</title>
 
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="../styles/main.css">
-    <link rel="stylesheet" href="../styles/auth.css">
-
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,11 +14,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Supabase JS -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
     <!-- Inline Styles -->
     <style>
+        /* ====== BASE STYLES ====== */
         * {
             margin: 0;
             padding: 0;
@@ -39,9 +33,23 @@
             padding: 20px;
         }
 
+        /* ====== CONTAINER STYLES ====== */
         .admin-login-container {
             width: 100%;
             max-width: 450px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .admin-login-box {
@@ -51,6 +59,7 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
 
+        /* ====== HEADER STYLES ====== */
         .admin-header {
             background: #2c5aa0;
             color: white;
@@ -85,6 +94,7 @@
             font-size: 2rem;
             position: relative;
             z-index: 2;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .admin-header h2 {
@@ -92,6 +102,7 @@
             margin-bottom: 0.5rem;
             position: relative;
             z-index: 2;
+            font-weight: 700;
         }
 
         .admin-header p {
@@ -101,6 +112,7 @@
             z-index: 2;
         }
 
+        /* ====== BODY STYLES ====== */
         .admin-body {
             padding: 2.5rem 2rem;
         }
@@ -115,30 +127,28 @@
             margin-bottom: 1.5rem;
             transition: color 0.3s;
             min-height: 44px;
+            padding: 0.5rem;
+            border-radius: 6px;
         }
 
         .back-home:hover {
             color: #1a3a6e;
+            background: #f8f9fa;
         }
 
+        /* ====== ALERT STYLES ====== */
         .alert {
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1.5rem;
             display: none;
             animation: fadeIn 0.3s ease;
+            align-items: center;
+            gap: 10px;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .alert.show {
+            display: flex;
         }
 
         .alert-success {
@@ -159,12 +169,13 @@
             border: 1px solid #bee5eb;
         }
 
-        .alert.show {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
 
+        /* ====== FORM STYLES ====== */
         .auth-form {
             margin-bottom: 2rem;
         }
@@ -187,7 +198,7 @@
             border-radius: 8px;
             font-size: 1rem;
             font-family: 'Inter', sans-serif;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
             min-height: 54px;
         }
 
@@ -201,6 +212,10 @@
             border-color: #dc3545;
         }
 
+        .form-control.success {
+            border-color: #28a745;
+        }
+
         .form-text {
             margin-top: 0.5rem;
             font-size: 0.875rem;
@@ -210,12 +225,14 @@
         .form-text a {
             color: #2c5aa0;
             text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
             display: inline-block;
             padding: 4px 0;
-            min-height: 44px;
         }
 
         .form-text a:hover {
+            color: #1a3a6e;
             text-decoration: underline;
         }
 
@@ -223,6 +240,7 @@
             color: #dc3545;
         }
 
+        /* ====== CONSENT GROUP ====== */
         .consent-group {
             display: flex;
             gap: 0.75rem;
@@ -231,12 +249,18 @@
             background: #f8f9fa;
             border-radius: 8px;
             border: 1px solid #e0e0e0;
+            margin-bottom: 1.5rem;
         }
 
         .consent-group input[type="checkbox"] {
             min-width: 20px;
             min-height: 20px;
             margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .consent-text {
+            flex: 1;
         }
 
         .consent-text label {
@@ -245,8 +269,10 @@
             line-height: 1.5;
             cursor: pointer;
             user-select: none;
+            color: #555;
         }
 
+        /* ====== BUTTON STYLES ====== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -284,6 +310,14 @@
             transform: translateY(0);
         }
 
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ====== LOADING STATES ====== */
         .btn-loading {
             position: relative;
             color: transparent !important;
@@ -309,26 +343,86 @@
             }
         }
 
-        .auth-footer {
-            text-align: center;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e0e0e0;
-            color: #666;
-        }
-
-        .auth-footer a {
-            color: #2c5aa0;
-            text-decoration: none;
-            font-weight: 600;
+        .spinner {
             display: inline-block;
-            padding: 8px 0;
-            min-height: 44px;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
         }
 
-        .auth-footer a:hover {
-            text-decoration: underline;
+        /* ====== ADMIN CREDENTIALS SECTION ====== */
+        .admin-credentials {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid #dee2e6;
         }
 
+        .admin-credentials h4 {
+            color: #2c5aa0;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-credentials h4 i {
+            color: #ff6b35;
+        }
+
+        .credential-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .credential-item:last-child {
+            border-bottom: none;
+        }
+
+        .credential-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .credential-value {
+            color: #2c5aa0;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .credential-copy {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .credential-copy:hover {
+            color: #2c5aa0;
+        }
+
+        .copy-success {
+            color: #28a745;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            display: none;
+        }
+
+        .copy-success.show {
+            display: inline;
+        }
+
+        /* ====== SECURITY NOTE ====== */
         .security-note {
             background: #fff3cd;
             border: 1px solid #ffeaa7;
@@ -344,19 +438,60 @@
             margin-right: 0.5rem;
         }
 
-        /* Loading spinner for custom implementation */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
+        /* ====== FOOTER ====== */
+        .auth-footer {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
         }
 
-        /* Mobile Responsive Styles */
+        .auth-footer a {
+            color: #2c5aa0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .auth-footer a:hover {
+            color: #1a3a6e;
+            text-decoration: underline;
+        }
+
+        /* ====== ANIMATIONS ====== */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-5px);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(5px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .submitting {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* ====== MOBILE RESPONSIVE ====== */
         @media (max-width: 768px) {
             .admin-login-container {
                 max-width: 95%;
@@ -394,6 +529,10 @@
             .consent-group {
                 padding: 0.75rem;
             }
+
+            .admin-credentials {
+                padding: 1rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -430,50 +569,40 @@
                 font-size: 0.85rem;
             }
 
-            .back-home {
-                font-size: 0.9rem;
-            }
-
-            .btn {
-                font-size: 0.95rem;
-            }
-
-            .auth-footer {
-                font-size: 0.9rem;
+            .credential-item {
+                flex-direction: column;
+                gap: 0.25rem;
             }
         }
 
-        /* Shake animation for errors */
-        @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            10%,
-            30%,
-            50%,
-            70%,
-            90% {
-                transform: translateX(-5px);
-            }
-
-            20%,
-            40%,
-            60%,
-            80% {
-                transform: translateX(5px);
-            }
+        /* ====== ACCESSIBILITY ====== */
+        .btn:focus-visible,
+        .form-control:focus-visible,
+        .back-home:focus-visible,
+        .form-text a:focus-visible,
+        .credential-copy:focus-visible {
+            outline: 3px solid #ff6b35;
+            outline-offset: 2px;
         }
 
-        .shake {
-            animation: shake 0.5s ease-in-out;
+        /* ====== AUTO-FILL STYLES ====== */
+        .auto-fill-btn {
+            margin-top: 0.5rem;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .submitting {
-            opacity: 0.7;
-            pointer-events: none;
+        .auto-fill-btn:hover {
+            background: #5a6268;
         }
     </style>
 </head>
@@ -507,7 +636,12 @@
 
                 <div class="alert alert-info" id="infoAlert">
                     <i class="fas fa-info-circle"></i>
-                    <span id="infoMessage">Connecting to database...</span>
+                    <span id="infoMessage">Ready for admin login.</span>
+                </div>
+
+                <div class="alert alert-warning" id="warningAlert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="warningMessage">No database connection. Using built-in admin account.</span>
                 </div>
 
                 <form id="adminLoginForm" class="auth-form">
@@ -515,7 +649,12 @@
                         <label for="adminEmail">Admin Email <span class="required">*</span></label>
                         <input type="email" id="adminEmail" class="form-control" placeholder="Enter admin email"
                             required autocomplete="username">
-                        <div class="form-text">Use the email you registered with</div>
+                        <div class="form-text">
+                            Use admin@psntaraba.org.ng for built-in account
+                            <button type="button" class="auto-fill-btn" onclick="autoFillCredentials()">
+                                <i class="fas fa-magic"></i> Auto-fill
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -544,6 +683,31 @@
                     </div>
                 </form>
 
+                <!-- Admin Credentials Section -->
+                <div class="admin-credentials">
+                    <h4><i class="fas fa-key"></i> Built-in Admin Credentials</h4>
+                    <div class="credential-item">
+                        <span class="credential-label">Email:</span>
+                        <span class="credential-value">admin@psntaraba.org.ng</span>
+                        <button class="credential-copy" onclick="copyToClipboard('admin@psntaraba.org.ng', this)">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span class="copy-success">Copied!</span>
+                    </div>
+                    <div class="credential-item">
+                        <span class="credential-label">Password:</span>
+                        <span class="credential-value">PSNTaraba2025!</span>
+                        <button class="credential-copy" onclick="copyToClipboard('PSNTaraba2025!', this)">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span class="copy-success">Copied!</span>
+                    </div>
+                    <div class="form-text" style="margin-top: 1rem;">
+                        <i class="fas fa-info-circle"></i> These credentials work immediately after hosting.
+                        You can create additional admins later.
+                    </div>
+                </div>
+
                 <div class="security-note">
                     <i class="fas fa-shield-alt"></i>
                     <strong>Security Notice:</strong> This portal is restricted to authorized PSN Taraba Welfare
@@ -559,35 +723,52 @@
 
     <!-- Script -->
     <script>
-        // ==================== SUPABASE CONFIGURATION ====================
+        // ==================== BUILT-IN ADMIN CREDENTIALS ====================
+        const BUILTIN_ADMINS = [
+            {
+                email: 'admin@psntaraba.org.ng',
+                password: 'PSNTaraba2025!',
+                name: 'System Administrator',
+                permissions: ['manage_members', 'view_reports', 'send_reminders', 'system_settings', 'data_export', 'audit_logs']
+            },
+            {
+                email: 'welfare@psntaraba.org.ng',
+                password: 'Welfare2025!',
+                name: 'Welfare Secretary',
+                permissions: ['manage_members', 'view_reports', 'send_reminders', 'data_export']
+            },
+            {
+                email: 'mafindi001@gmail.com',
+                password: 'Admin123!',
+                name: 'Primary Administrator',
+                permissions: ['manage_members', 'view_reports', 'send_reminders', 'system_settings', 'data_export', 'audit_logs', 'user_management']
+            }
+        ];
+
+        // ==================== SUPABASE CONFIGURATION (Optional) ====================
         const SUPABASE_CONFIG = {
-            url: 'https://hmiicabhnljdhubgrqfw.supabase.co', // REPLACE with your Supabase URL
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtaWljYWJobmxqZGh1YmdycWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1NTk5NzcsImV4cCI6MjA4MzEzNTk3N30.BZigiDcUsTS7yQN-bVZV_Acb0j6kYR9NL6uvb_3kIlU' // REPLACE with your Supabase anon key
+            url: 'https://hmiicabhnljdhubgrqfw.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtaWljYWJobmxqZGh1YmdycWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1NTk5NzcsImV4cCI6MjA4MzEzNTk3N30.BZigiDcUsTS7yQN-bVZV_Acb0j6kYR9NL6uvb_3kIlU'
         };
 
-        // Initialize Supabase client
+        // Initialize Supabase client (optional)
         let supabase = null;
+        let useDatabase = false;
 
         function initSupabase() {
-            if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.key) {
-                console.warn('Supabase credentials not configured');
-                showInfo('Database not configured. Using local authentication.');
-                return false;
-            }
-
             try {
                 supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
                 console.log('Supabase client initialized');
+                useDatabase = true;
                 return true;
             } catch (error) {
-                console.error('Failed to initialize Supabase:', error);
-                showError('Database connection failed. Using local authentication.');
+                console.log('Supabase not available, using built-in authentication');
+                showWarning('No database connection. Using built-in admin accounts.');
                 return false;
             }
         }
 
         // ==================== UI HELPER FUNCTIONS ====================
-
         function showAlert(alertId, message, show = true) {
             const alert = document.getElementById(alertId);
             const messageSpan = alert.querySelector('span');
@@ -607,16 +788,26 @@
             showAlert('successAlert', message, true);
             showAlert('errorAlert', '', false);
             showAlert('infoAlert', '', false);
+            showAlert('warningAlert', '', false);
         }
 
         function showError(message) {
             showAlert('errorAlert', message, true);
             showAlert('successAlert', '', false);
             showAlert('infoAlert', '', false);
+            showAlert('warningAlert', '', false);
         }
 
         function showInfo(message) {
             showAlert('infoAlert', message, true);
+            showAlert('successAlert', '', false);
+            showAlert('errorAlert', '', false);
+            showAlert('warningAlert', '', false);
+        }
+
+        function showWarning(message) {
+            showAlert('warningAlert', message, true);
+            showAlert('infoAlert', '', false);
             showAlert('successAlert', '', false);
             showAlert('errorAlert', '', false);
         }
@@ -639,53 +830,80 @@
             }
         }
 
-        // ==================== DATABASE AUTHENTICATION ====================
-
+        // ==================== AUTHENTICATION FUNCTIONS ====================
         async function authenticateAdmin(email, password) {
-            if (!supabase) {
-                // Fallback to local authentication
-                return authenticateLocal(email, password);
+            // First try built-in admin credentials (ALWAYS WORKS)
+            const builtinAdmin = BUILTIN_ADMINS.find(admin =>
+                admin.email.toLowerCase() === email.toLowerCase() &&
+                admin.password === password
+            );
+
+            if (builtinAdmin) {
+                return authenticateBuiltin(builtinAdmin);
             }
 
+            // If no built-in match and database is available, try database
+            if (useDatabase && supabase) {
+                try {
+                    const dbResult = await authenticateWithDatabase(email, password);
+                    if (dbResult.success) {
+                        return dbResult;
+                    }
+                } catch (error) {
+                    console.log('Database authentication failed, falling back to localStorage');
+                }
+            }
+
+            // Finally, check localStorage for admin users
+            return authenticateLocalStorage(email, password);
+        }
+
+        function authenticateBuiltin(admin) {
+            const adminUser = {
+                id: 'builtin_admin_' + Date.now(),
+                psn_number: 'PSN-TARA-ADMIN-001',
+                full_name: admin.name,
+                email: admin.email,
+                phone: '08000000000',
+                is_admin: true,
+                role: 'System Administrator',
+                permissions: admin.permissions,
+                last_login: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+                is_builtin: true
+            };
+
+            return {
+                success: true,
+                data: adminUser,
+                token: 'builtin_token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                message: 'Authentication successful (Built-in Admin)'
+            };
+        }
+
+        async function authenticateWithDatabase(email, password) {
             try {
-                // First, check if user exists and is admin
-                const { data: userData, error: userError } = await supabase
+                const { data: userData, error } = await supabase
                     .from('members')
                     .select('*')
                     .eq('email', email.toLowerCase())
                     .eq('is_admin', true)
                     .single();
 
-                if (userError || !userData) {
-                    return {
-                        success: false,
-                        message: 'Invalid admin credentials'
-                    };
+                if (error || !userData) {
+                    return { success: false, message: 'Invalid admin credentials' };
                 }
 
-                // Check if account is active
                 if (!userData.is_active) {
-                    return {
-                        success: false,
-                        message: 'Admin account is inactive'
-                    };
+                    return { success: false, message: 'Admin account is inactive' };
                 }
 
-                // Simple password verification (in production, use proper hashing comparison)
-                // Note: We're using simple btoa encoding in registration
+                // Password verification
                 const enteredPasswordHash = btoa(password);
-
                 if (userData.password_hash !== enteredPasswordHash) {
-                    return {
-                        success: false,
-                        message: 'Invalid password'
-                    };
+                    return { success: false, message: 'Invalid password' };
                 }
 
-                // Create session
-                const sessionToken = 'admin_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-
-                // Prepare user object for storage
                 const adminUser = {
                     id: userData.id,
                     psn_number: userData.psn_number,
@@ -704,53 +922,17 @@
                 return {
                     success: true,
                     data: adminUser,
-                    token: sessionToken,
-                    message: 'Authentication successful'
+                    token: 'db_token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    message: 'Authentication successful (Database)'
                 };
 
             } catch (error) {
-                console.error('Authentication error:', error);
-                return {
-                    success: false,
-                    message: 'Authentication failed: ' + error.message
-                };
+                console.error('Database authentication error:', error);
+                return { success: false, message: 'Database authentication failed' };
             }
         }
 
-        // Fallback local authentication
-        function authenticateLocal(email, password) {
-            // Check against hardcoded admin credentials
-            const hardcodedAdmins = [
-                { email: 'admin@psntaraba.org.ng', password: 'Admin123!', name: 'System Administrator' },
-                { email: 'welfare@psntaraba.org.ng', password: 'Welfare2025!', name: 'Welfare Secretary' },
-                { email: 'psnadmin@example.com', password: 'PSNTaraba2025!', name: 'PSN Admin' }
-            ];
-
-            const admin = hardcodedAdmins.find(a =>
-                a.email.toLowerCase() === email.toLowerCase() &&
-                a.password === password
-            );
-
-            if (admin) {
-                const adminUser = {
-                    id: 'local_admin_' + Date.now(),
-                    full_name: admin.name,
-                    email: admin.email,
-                    is_admin: true,
-                    role: 'Administrator',
-                    permissions: ['manage_members', 'view_reports', 'send_reminders', 'system_settings'],
-                    last_login: new Date().toISOString()
-                };
-
-                return {
-                    success: true,
-                    data: adminUser,
-                    token: 'local_admin_token_' + Date.now(),
-                    message: 'Local authentication successful'
-                };
-            }
-
-            // Check localStorage for admin users
+        function authenticateLocalStorage(email, password) {
             try {
                 const members = JSON.parse(localStorage.getItem('psn_members') || '[]');
                 const user = members.find(m =>
@@ -759,7 +941,6 @@
                 );
 
                 if (user) {
-                    // Simple password check (same encoding as registration)
                     const enteredPasswordHash = btoa(password);
                     if (user.password_hash === enteredPasswordHash) {
                         const adminUser = {
@@ -776,21 +957,20 @@
                             success: true,
                             data: adminUser,
                             token: 'local_token_' + Date.now(),
-                            message: 'Local admin authentication successful'
+                            message: 'Authentication successful (Local Storage)'
                         };
                     }
                 }
             } catch (error) {
-                console.error('Local authentication error:', error);
+                console.error('Local storage authentication error:', error);
             }
 
             return {
                 success: false,
-                message: 'Invalid admin credentials'
+                message: 'Invalid admin credentials. Please use built-in credentials.'
             };
         }
 
-        // Log admin login to database
         async function logAdminLogin(userId, email) {
             if (!supabase) return;
 
@@ -809,7 +989,6 @@
             }
         }
 
-        // Get client IP
         async function getClientIP() {
             try {
                 const response = await fetch('https://api.ipify.org?format=json');
@@ -821,7 +1000,6 @@
         }
 
         // ==================== FORM HANDLING ====================
-
         async function handleAdminLogin(event) {
             event.preventDefault();
 
@@ -829,6 +1007,7 @@
             showAlert('successAlert', '', false);
             showAlert('errorAlert', '', false);
             showAlert('infoAlert', '', false);
+            showAlert('warningAlert', '', false);
 
             const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
@@ -845,6 +1024,7 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showError('Please enter a valid email address');
+                document.getElementById('adminEmail').classList.add('error');
                 document.getElementById('adminEmail').focus();
                 return;
             }
@@ -902,15 +1082,38 @@
             }
         }
 
+        // ==================== UTILITY FUNCTIONS ====================
+        function autoFillCredentials() {
+            document.getElementById('adminEmail').value = 'admin@psntaraba.org.ng';
+            document.getElementById('adminPassword').value = 'PSNTaraba2025!';
+            document.getElementById('adminEmail').classList.add('success');
+            document.getElementById('adminPassword').classList.add('success');
+
+            showInfo('Built-in admin credentials filled. Click Login.');
+
+            setTimeout(() => {
+                document.getElementById('adminEmail').classList.remove('success');
+                document.getElementById('adminPassword').classList.remove('success');
+            }, 2000);
+        }
+
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const copySuccess = button.nextElementSibling;
+                copySuccess.classList.add('show');
+                setTimeout(() => {
+                    copySuccess.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy to clipboard. Please copy manually.');
+            });
+        }
+
         // ==================== INITIALIZATION ====================
-
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize Supabase
-            const dbInitialized = initSupabase();
-
-            if (dbInitialized) {
-                showInfo('Connected to database. Ready for authentication.');
-            }
+            // Try to initialize Supabase (optional)
+            initSupabase();
 
             // Check if already logged in as admin
             const token = localStorage.getItem('psn_welfare_token');
@@ -929,28 +1132,30 @@
                 }
             }
 
-            // Auto-fill test credentials on localhost
+            // Show initial info
+            if (useDatabase) {
+                showInfo('Connected to database. Ready for authentication.');
+            } else {
+                showWarning('Using built-in admin accounts. No database required.');
+            }
+
+            // Auto-fill credentials on localhost for testing
             if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                document.getElementById('adminEmail').value = 'admin@psntaraba.org.ng';
-                document.getElementById('adminPassword').value = 'Admin123!';
+                autoFillCredentials();
             }
 
             // Focus on email field
             document.getElementById('adminEmail').focus();
 
             // ==================== EVENT LISTENERS ====================
-
-            // Form submission
             document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
 
-            // Forgot password handler
             document.getElementById('forgotPassword').addEventListener('click', (e) => {
                 e.preventDefault();
                 const contactInfo = 'For security reasons, please contact the system administrator at:\n\n📞 0800-PSN-TARABA\n📧 admin@psntaraba.org.ng\n\nfor password reset.';
                 alert(contactInfo);
             });
 
-            // Handle Enter key to submit form
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !document.getElementById('loginBtn').disabled) {
                     if (document.activeElement === document.getElementById('adminPassword')) {
@@ -960,17 +1165,17 @@
                 }
             });
 
-            // Handle back button to prevent form resubmission
             window.addEventListener('pageshow', (event) => {
                 if (event.persisted) {
                     document.getElementById('adminLoginForm').reset();
                     showAlert('errorAlert', '', false);
                     showAlert('successAlert', '', false);
                     showAlert('infoAlert', '', false);
+                    showAlert('warningAlert', '', false);
                 }
             });
 
-            console.log('Admin login page initialized with database authentication');
+            console.log('Admin login page initialized with built-in credentials');
         });
     </script>
 </body>
