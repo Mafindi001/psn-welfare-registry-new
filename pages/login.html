@@ -50,14 +50,21 @@
 
         .form-group {
             margin-bottom: 1.5rem;
+            position: relative;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px;
+            padding: 12px 40px 12px 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            border-color: #2c5aa0;
+            outline: none;
         }
 
         .btn {
@@ -68,11 +75,136 @@
             border-radius: 8px;
             font-size: 1rem;
             cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #1e3d6f;
         }
 
         .btn-block {
             width: 100%;
             padding: 14px;
+        }
+
+        .btn-loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Password toggle button styles */
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1rem;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: #2c5aa0;
+        }
+
+        /* Alert styles */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        /* Form text and links */
+        .form-text {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-text a {
+            color: #2c5aa0;
+            text-decoration: none;
+        }
+
+        .form-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Back home link */
+        .back-home {
+            display: inline-block;
+            color: #2c5aa0;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .back-home:hover {
+            text-decoration: underline;
+        }
+
+        /* Auth footer */
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+        }
+
+        .auth-footer a {
+            color: #2c5aa0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Required field indicator */
+        .required {
+            color: #dc3545;
+        }
+
+        /* Consent group */
+        .consent-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .consent-text label {
+            cursor: pointer;
+            margin: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .auth-box {
+                margin: 0 10px;
+            }
+
+            .auth-header,
+            .auth-body {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -91,11 +223,11 @@
                 </a>
 
                 <!-- Messages -->
-                <div class="alert alert-success" id="successAlert" style="display: none;">
+                <div class="alert alert-success" id="successAlert">
                     Login successful! Redirecting...
                 </div>
 
-                <div class="alert alert-error" id="errorAlert" style="display: none;">
+                <div class="alert alert-error" id="errorAlert">
                     Invalid credentials. Please try again.
                 </div>
 
@@ -108,8 +240,13 @@
 
                     <div class="form-group">
                         <label for="loginPassword">Password <span class="required">*</span></label>
-                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password"
-                            required>
+                        <div style="position: relative;">
+                            <input type="password" id="loginPassword" class="form-control"
+                                placeholder="Enter your password" required>
+                            <button type="button" class="password-toggle" id="passwordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                         <div class="form-text">
                             <a href="#forgot" id="forgotPassword">Forgot password?</a>
                         </div>
@@ -141,9 +278,6 @@
     <script src="/scripts/utils.js"></script>
     <script src="/scripts/api.js"></script>
 
-    ript src="/scripts/utils.js"></script>
-    <script src="/scripts/api.js"></script>
-
     <script>
         // DOM Elements
         const loginForm = document.getElementById('loginForm');
@@ -151,9 +285,33 @@
         const successAlert = document.getElementById('successAlert');
         const errorAlert = document.getElementById('errorAlert');
         const forgotPasswordLink = document.getElementById('forgotPassword');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('loginPassword');
+
+        // Initialize password toggle
+        function initializePasswordToggle() {
+            passwordToggle.addEventListener('click', function () {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+
+                // Toggle eye icon
+                const icon = this.querySelector('i');
+                if (type === 'password') {
+                    icon.className = 'fas fa-eye';
+                } else {
+                    icon.className = 'fas fa-eye-slash';
+                }
+
+                // Focus back on input after toggle
+                passwordInput.focus();
+            });
+        }
 
         // Check if already logged in (prevent login page access if authenticated)
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize password toggle
+            initializePasswordToggle();
+
             const token = localStorage.getItem('psn_welfare_token');
             const user = localStorage.getItem('psn_welfare_user');
 
@@ -164,7 +322,7 @@
                 // Check if user is admin
                 try {
                     const userObj = JSON.parse(user);
-                    if (userObj.isAdmin) {
+                    if (userObj.isAdmin || userObj.is_admin) {
                         window.location.href = '/pages/admin.html';
                     } else {
                         window.location.href = '/pages/dashboard.html';
@@ -196,6 +354,11 @@
                 return;
             }
 
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters long');
+                return;
+            }
+
             // Show loading
             loginBtn.classList.add('btn-loading');
             loginBtn.disabled = true;
@@ -209,16 +372,17 @@
                 // In production, validate against backend
                 const mockUser = {
                     id: 'user_' + Date.now(),
-                    psnNumber: psnOrEmail.includes('@') ? 'PSN-TARA-2023-001' : psnOrEmail,
-                    fullName: 'Demo Pharmacist',
+                    psn_number: psnOrEmail.includes('@') ? 'PSN-TARA-2023-001' : psnOrEmail,
+                    full_name: 'Demo Pharmacist',
                     email: psnOrEmail.includes('@') ? psnOrEmail : 'pharmacist@example.com',
                     phone: '08031234567',
-                    dateOfBirth: '1985-05-15',
-                    weddingDate: '2015-06-22',
-                    isAdmin: psnOrEmail.toLowerCase().includes('admin'),
-                    consentGiven: true,
-                    consentDate: new Date().toISOString(),
-                    createdAt: new Date().toISOString()
+                    date_of_birth: '1985-05-15',
+                    wedding_date: '2015-06-22',
+                    is_admin: psnOrEmail.toLowerCase().includes('admin'),
+                    is_active: true,
+                    consent_given: true,
+                    consent_date: new Date().toISOString(),
+                    created_at: new Date().toISOString()
                 };
 
                 // Store in localStorage
@@ -228,6 +392,12 @@
                 // Store remember me preference
                 if (rememberMe) {
                     localStorage.setItem('psn_remember_me', 'true');
+                    localStorage.setItem('psn_remembered_user', JSON.stringify({
+                        psnOrEmail: psnOrEmail
+                    }));
+                } else {
+                    localStorage.removeItem('psn_remember_me');
+                    localStorage.removeItem('psn_remembered_user');
                 }
 
                 console.log('Login successful, user stored:', mockUser);
@@ -238,7 +408,7 @@
 
                 // Redirect based on role after short delay
                 setTimeout(() => {
-                    if (mockUser.isAdmin) {
+                    if (mockUser.is_admin) {
                         console.log('Redirecting to admin dashboard');
                         window.location.href = '/pages/admin.html';
                     } else {
@@ -261,16 +431,67 @@
             errorAlert.textContent = message;
             errorAlert.style.display = 'block';
             successAlert.style.display = 'none';
+
+            // Scroll to error message
+            errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         // Forgot password handler
         forgotPasswordLink.addEventListener('click', (e) => {
             e.preventDefault();
-            alert('Password reset feature will be available soon. Please contact the Welfare Secretary.');
+            const email = document.getElementById('loginPsn').value;
+
+            if (!email) {
+                showError('Please enter your email address to reset password');
+                document.getElementById('loginPsn').focus();
+                return;
+            }
+
+            if (!email.includes('@')) {
+                showError('Please enter a valid email address to reset password');
+                return;
+            }
+
+            // Show loading on forgot password
+            const originalText = forgotPasswordLink.textContent;
+            forgotPasswordLink.innerHTML = '<span class="spinner"></span> Sending reset email...';
+            forgotPasswordLink.style.pointerEvents = 'none';
+
+            setTimeout(() => {
+                alert(`Password reset instructions have been sent to ${email} (demo mode). In production, this would send a real email.`);
+                forgotPasswordLink.textContent = originalText;
+                forgotPasswordLink.style.pointerEvents = 'auto';
+            }, 1500);
         });
 
         // Form submit event
         loginForm.addEventListener('submit', handleLogin);
+
+        // Add spinner style for forgot password
+        const spinnerStyle = document.createElement('style');
+        spinnerStyle.textContent = `
+            .spinner {
+                display: inline-block;
+                width: 12px;
+                height: 12px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top-color: #fff;
+                animation: spin 1s ease-in-out infinite;
+                margin-right: 5px;
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            
+            #forgotPassword .spinner {
+                border-top-color: #2c5aa0;
+                width: 10px;
+                height: 10px;
+            }
+        `;
+        document.head.appendChild(spinnerStyle);
     </script>
 </body>
 

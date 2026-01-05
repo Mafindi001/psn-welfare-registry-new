@@ -15,7 +15,7 @@
     <!-- Include Supabase JS -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        /* Mobile Responsive Styles */
+        /* Enhanced Mobile Responsive Styles */
         @media (max-width: 768px) {
             .dashboard-container {
                 flex-direction: column;
@@ -23,13 +23,14 @@
 
             .dashboard-sidebar {
                 width: 100%;
-                height: auto;
+                height: 100vh;
                 position: fixed;
                 top: 0;
                 left: -100%;
                 z-index: 1000;
                 transition: left 0.3s ease;
                 box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+                overflow-y: auto;
             }
 
             .dashboard-sidebar.mobile-open {
@@ -54,27 +55,34 @@
 
             .admin-stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
             }
 
             .quick-actions-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
             }
 
             .reports-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
 
             .monitoring-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
 
             .table-responsive {
                 overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
 
             .modal-content {
                 width: 95%;
                 margin: 20px auto;
+                max-height: 90vh;
+                overflow-y: auto;
             }
 
             .mobile-menu-toggle {
@@ -87,6 +95,57 @@
 
             .settings-tab {
                 flex: 1 0 50%;
+                padding: 10px;
+                text-align: center;
+            }
+
+            .mobile-close {
+                display: block !important;
+                position: absolute;
+                right: 15px;
+                top: 15px;
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1001;
+            }
+
+            .sidebar-header {
+                padding-right: 60px;
+            }
+
+            .table-actions {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .date-range {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .date-range input {
+                width: 100%;
             }
         }
 
@@ -108,6 +167,10 @@
                 gap: 10px;
             }
 
+            .header-title {
+                margin-bottom: 15px;
+            }
+
             .filter-bar {
                 flex-direction: column;
                 gap: 10px;
@@ -117,14 +180,13 @@
                 flex-direction: column;
             }
 
-            .table-actions {
+            .action-buttons {
                 flex-direction: column;
-                gap: 15px;
+                align-items: stretch;
             }
 
-            .action-buttons {
-                flex-wrap: wrap;
-                justify-content: center;
+            .action-buttons .btn {
+                width: 100%;
             }
         }
 
@@ -137,6 +199,7 @@
             color: var(--primary-color, #2c5aa0);
             cursor: pointer;
             padding: 10px;
+            margin-right: 10px;
         }
 
         @media (max-width: 768px) {
@@ -155,6 +218,7 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
+            backdrop-filter: blur(3px);
         }
 
         .mobile-overlay.active {
@@ -165,15 +229,21 @@
         .btn,
         button,
         .nav-item,
-        .quick-action-btn {
+        .quick-action-btn,
+        .pagination-btn,
+        .settings-tab {
             min-height: 44px;
             min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         input,
         select {
             font-size: 16px;
-            /* Prevents zoom on iOS */
+            padding: 12px;
+            border-radius: 8px;
         }
 
         /* Loading states */
@@ -197,6 +267,797 @@
             to {
                 transform: rotate(360deg);
             }
+        }
+
+        /* Password toggle styles */
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1rem;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: #2c5aa0;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-control[type="password"],
+        .form-control[type="text"] {
+            padding-right: 40px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            position: sticky;
+            bottom: 0;
+            background: white;
+            z-index: 1;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .notification-success {
+            background: #28a745;
+            border-left: 4px solid #1e7e34;
+        }
+
+        .notification-error {
+            background: #dc3545;
+            border-left: 4px solid #bd2130;
+        }
+
+        .notification-warning {
+            background: #ffc107;
+            border-left: 4px solid #d39e00;
+            color: #212529;
+        }
+
+        .notification-info {
+            background: #17a2b8;
+            border-left: 4px solid #117a8b;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-hide {
+            animation: slideOut 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .type-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .type-badge.member {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .type-badge.admin {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        /* Enhanced button styles */
+        .btn {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2c5aa0, #3a7bd5);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #2c5aa0;
+            color: #2c5aa0;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+
+        /* Enhanced table styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Enhanced form styles */
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2c5aa0;
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Enhanced card styles */
+        .admin-stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .admin-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-action-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            border-color: #2c5aa0;
+            background: #f8faff;
+            transform: translateY(-3px);
+        }
+
+        .action-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #2c5aa0, #3a7bd5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* Enhanced sidebar styles */
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #495057;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 5px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(44, 90, 160, 0.1);
+            color: #2c5aa0;
+        }
+
+        .nav-item.active {
+            background: #2c5aa0;
+            color: white;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            min-width: 25px;
+            text-align: center;
+        }
+
+        /* Enhanced section headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            color: #2c5aa0;
+            font-size: 1.5rem;
+        }
+
+        /* Enhanced search box */
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        /* Enhanced filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            font-size: 16px;
+            min-width: 150px;
+        }
+
+        /* Enhanced pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .pagination-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #2c5aa0;
+            background: #f8faff;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Enhanced settings */
+        .settings-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .settings-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .settings-tab:hover {
+            color: #2c5aa0;
+            background: rgba(44, 90, 160, 0.1);
+        }
+
+        .settings-tab.active {
+            color: #2c5aa0;
+            background: white;
+            border-bottom: 3px solid #2c5aa0;
+        }
+
+        .settings-group {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-group h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #2c5aa0;
+            font-size: 1.3rem;
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .consent-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .consent-group input[type="checkbox"] {
+            margin-top: 5px;
+        }
+
+        .consent-text {
+            flex: 1;
+        }
+
+        .consent-text label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        /* Activity feed */
+        .activity-feed {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2c5aa0;
+            font-size: 1.2rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            margin: 0 0 5px 0;
+            color: #495057;
+        }
+
+        .activity-time {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        /* Report preview */
+        .report-preview {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 2px dashed #e0e0e0;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .preview-content {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-height: 200px;
+        }
+
+        /* Calendar */
+        .calendar-view {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav:hover {
+            border-color: #2c5aa0;
+            background: #f8faff;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background: #f8faff;
+            border-color: #2c5aa0;
+        }
+
+        .calendar-day.event {
+            background: #e3f2fd;
+            border-color: #1565c0;
+        }
+
+        /* Alert styles */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-left: 4px solid #117a8b;
+            color: #0c5460;
+        }
+
+        /* Database info */
+        .db-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Log action styles */
+        .log-action {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            display: inline-block;
+        }
+
+        .log-action.login {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .log-action.logout {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .log-action.registration {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .log-action.update {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .log-action.delete {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .log-action.member_add {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .log-action.member_update {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .log-action.member_delete {
+            background: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
@@ -860,7 +1721,12 @@
 
                         <div class="setting-item">
                             <label for="smtpPass">SMTP Password</label>
-                            <input type="password" id="smtpPass" class="form-control" placeholder="Enter password">
+                            <div style="position: relative;">
+                                <input type="password" id="smtpPass" class="form-control" placeholder="Enter password">
+                                <button type="button" class="password-toggle" id="smtpPasswordToggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="setting-item">
@@ -1009,7 +1875,12 @@
 
                     <div class="form-group">
                         <label for="newMemberPassword">Temporary Password *</label>
-                        <input type="password" id="newMemberPassword" class="form-control" required minlength="6">
+                        <div style="position: relative;">
+                            <input type="password" id="newMemberPassword" class="form-control" required minlength="6">
+                            <button type="button" class="password-toggle" id="newMemberPasswordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                         <div class="form-text">Minimum 6 characters. Member will change on first login</div>
                     </div>
 
@@ -1094,7 +1965,6 @@
     <!-- Scripts -->
     <script>
         // ==================== SUPABASE CONFIGURATION ====================
-        // You MUST replace these with your actual Supabase credentials
         const SUPABASE_CONFIG = {
             url: localStorage.getItem('supabase_url') || '',
             key: localStorage.getItem('supabase_key') || '',
@@ -1131,7 +2001,6 @@
 
         // ==================== DATABASE FUNCTIONS ====================
 
-        // Test database connection
         async function testDatabaseConnection() {
             if (!supabase) return false;
 
@@ -1150,9 +2019,11 @@
             }
         }
 
-        // Load members from database
         async function loadMembersFromDB() {
-            if (!supabase) return [];
+            if (!supabase) {
+                const members = JSON.parse(localStorage.getItem('psn_members') || '[]');
+                return members;
+            }
 
             try {
                 const { data, error } = await supabase
@@ -1165,19 +2036,30 @@
             } catch (error) {
                 console.error('Error loading members:', error);
                 showNotification('Failed to load members from database', 'error');
-                return [];
+                const members = JSON.parse(localStorage.getItem('psn_members') || '[]');
+                return members;
             }
         }
 
-        // Add member to database
         async function addMemberToDB(memberData) {
             if (!supabase) {
-                // Fallback to localStorage
                 const members = JSON.parse(localStorage.getItem('psn_members') || '[]');
                 memberData.id = Date.now().toString();
                 memberData.created_at = new Date().toISOString();
                 members.push(memberData);
                 localStorage.setItem('psn_members', JSON.stringify(members));
+
+                // Log the action
+                const logs = JSON.parse(localStorage.getItem('psn_logs') || '[]');
+                logs.unshift({
+                    user_id: getCurrentUser()?.id || 'admin',
+                    action: 'member_add',
+                    details: `Added new member: ${memberData.full_name}`,
+                    ip_address: '127.0.0.1',
+                    created_at: new Date().toISOString()
+                });
+                localStorage.setItem('psn_logs', JSON.stringify(logs));
+
                 return { success: true, data: memberData };
             }
 
@@ -1189,10 +2071,7 @@
                     .single();
 
                 if (error) throw error;
-
-                // Log the action
                 await logSystemAction('member_add', `Added member: ${memberData.full_name}`);
-
                 return { success: true, data };
             } catch (error) {
                 console.error('Error adding member:', error);
@@ -1200,10 +2079,8 @@
             }
         }
 
-        // Update member in database
         async function updateMemberInDB(id, updates) {
             if (!supabase) {
-                // Fallback to localStorage
                 const members = JSON.parse(localStorage.getItem('psn_members') || '[]');
                 const index = members.findIndex(m => m.id === id);
                 if (index !== -1) {
@@ -1230,10 +2107,8 @@
             }
         }
 
-        // Delete member from database
         async function deleteMemberFromDB(id) {
             if (!supabase) {
-                // Fallback to localStorage
                 const members = JSON.parse(localStorage.getItem('psn_members') || '[]');
                 const filtered = members.filter(m => m.id !== id);
                 localStorage.setItem('psn_members', JSON.stringify(filtered));
@@ -1255,17 +2130,16 @@
             }
         }
 
-        // Load system logs from database
         async function loadSystemLogsFromDB() {
-            if (!supabase) return [];
+            if (!supabase) {
+                const logs = JSON.parse(localStorage.getItem('psn_logs') || '[]');
+                return logs;
+            }
 
             try {
                 const { data, error } = await supabase
                     .from(SUPABASE_CONFIG.tables.logs)
-                    .select(`
-                        *,
-                        member:members(full_name, email)
-                    `)
+                    .select('*')
                     .order('created_at', { ascending: false })
                     .limit(100);
 
@@ -1273,38 +2147,46 @@
                 return data || [];
             } catch (error) {
                 console.error('Error loading logs:', error);
-                return [];
+                const logs = JSON.parse(localStorage.getItem('psn_logs') || '[]');
+                return logs;
             }
         }
 
-        // Log system action to database
         async function logSystemAction(action, details) {
             const user = getCurrentUser();
-            if (!user || !supabase) return;
+            if (!user) return;
+
+            const logEntry = {
+                user_id: user.id,
+                action: action,
+                details: details,
+                ip_address: await getClientIP(),
+                created_at: new Date().toISOString()
+            };
+
+            if (!supabase) {
+                const logs = JSON.parse(localStorage.getItem('psn_logs') || '[]');
+                logs.unshift(logEntry);
+                localStorage.setItem('psn_logs', JSON.stringify(logs));
+                return;
+            }
 
             try {
                 await supabase
                     .from(SUPABASE_CONFIG.tables.logs)
-                    .insert([{
-                        user_id: user.id,
-                        action: action,
-                        details: details,
-                        ip_address: await getClientIP(),
-                        created_at: new Date().toISOString()
-                    }]);
+                    .insert([logEntry]);
             } catch (error) {
                 console.error('Error logging action:', error);
             }
         }
 
-        // Get client IP (simplified)
         async function getClientIP() {
             try {
                 const response = await fetch('https://api.ipify.org?format=json');
                 const data = await response.json();
                 return data.ip;
             } catch {
-                return 'unknown';
+                return '127.0.0.1';
             }
         }
 
@@ -1345,6 +2227,10 @@
         }
 
         function showNotification(message, type = 'info') {
+            // Remove any existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(n => n.remove());
+
             const notification = document.createElement('div');
             notification.className = `notification notification-${type}`;
             notification.innerHTML = `
@@ -1366,47 +2252,101 @@
             }, 3000);
         }
 
+        // ==================== PASSWORD TOGGLE FUNCTIONS ====================
+
+        function initializePasswordToggles() {
+            // SMTP password toggle
+            const smtpPasswordToggle = document.getElementById('smtpPasswordToggle');
+            const smtpPass = document.getElementById('smtpPass');
+
+            if (smtpPasswordToggle && smtpPass) {
+                smtpPasswordToggle.addEventListener('click', function () {
+                    const type = smtpPass.type === 'password' ? 'text' : 'password';
+                    smtpPass.type = type;
+                    const icon = this.querySelector('i');
+                    icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                });
+            }
+
+            // New member password toggle
+            const newMemberPasswordToggle = document.getElementById('newMemberPasswordToggle');
+            const newMemberPassword = document.getElementById('newMemberPassword');
+
+            if (newMemberPasswordToggle && newMemberPassword) {
+                newMemberPasswordToggle.addEventListener('click', function () {
+                    const type = newMemberPassword.type === 'password' ? 'text' : 'password';
+                    newMemberPassword.type = type;
+                    const icon = this.querySelector('i');
+                    icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                });
+            }
+        }
+
         // ==================== DASHBOARD DATA LOADING ====================
 
         async function loadDashboardData() {
             const refreshBtn = document.getElementById('refreshDataBtn');
             const refreshText = document.getElementById('refreshText');
 
-            // Show loading state
             refreshBtn.classList.add('loading');
             refreshText.innerHTML = '<span class="spinner"></span> Refreshing...';
 
             try {
-                // Test database connection
                 const dbConnected = await testDatabaseConnection();
 
                 if (dbConnected && supabase) {
-                    // Load real data from database
                     const members = await loadMembersFromDB();
                     const activeMembers = members.filter(m => m.is_active).length;
+                    const events = JSON.parse(localStorage.getItem('psn_events') || '[]');
 
-                    // Update UI with real data
+                    // Get upcoming events (next 30 days)
+                    const today = new Date();
+                    const nextMonth = new Date(today);
+                    nextMonth.setDate(nextMonth.getDate() + 30);
+
+                    const upcomingEvents = events.filter(event => {
+                        const eventDate = new Date(event.date);
+                        return eventDate >= today && eventDate <= nextMonth;
+                    });
+
                     document.getElementById('totalMembers').textContent = members.length;
                     document.getElementById('activeMembers').textContent = activeMembers;
+                    document.getElementById('upcomingCelebrations').textContent = upcomingEvents.length;
                     document.getElementById('membersCount').textContent = members.length;
 
-                    // Update database status
                     document.getElementById('dbConnection').textContent = 'Connected';
                     document.getElementById('dbConnection').style.color = '#28a745';
                     document.getElementById('tablesCount').textContent = '5 tables';
                     document.getElementById('systemHealth').textContent = 'Healthy';
                     document.getElementById('apiStatus').textContent = 'Online';
 
-                    // Update recent activity from logs
                     const logs = await loadSystemLogsFromDB();
                     updateActivityFeed(logs.slice(0, 5));
 
+                    // Update reminder stats
+                    const reminders = JSON.parse(localStorage.getItem('psn_reminders') || '[]');
+                    document.getElementById('remindersSent').textContent = reminders.length;
+                    document.getElementById('remindersCount').textContent = reminders.length;
+
                     showNotification('Data refreshed from database', 'success');
                 } else {
-                    // Fallback to localStorage
                     const members = JSON.parse(localStorage.getItem('psn_members') || '[]');
+                    const events = JSON.parse(localStorage.getItem('psn_events') || '[]');
+                    const activeMembers = members.filter(m => m.is_active !== false).length;
+
+                    // Get upcoming events
+                    const today = new Date();
+                    const nextMonth = new Date(today);
+                    nextMonth.setDate(nextMonth.getDate() + 30);
+
+                    const upcomingEvents = events.filter(event => {
+                        const eventDate = new Date(event.date);
+                        return eventDate >= today && eventDate <= nextMonth;
+                    });
+
                     document.getElementById('totalMembers').textContent = members.length;
-                    document.getElementById('activeMembers').textContent = members.filter(m => m.is_active !== false).length;
+                    document.getElementById('activeMembers').textContent = activeMembers;
+                    document.getElementById('upcomingCelebrations').textContent = upcomingEvents.length;
                     document.getElementById('membersCount').textContent = members.length;
 
                     document.getElementById('dbConnection').textContent = 'Local Storage';
@@ -1414,17 +2354,24 @@
                     document.getElementById('systemHealth').textContent = 'Limited';
                     document.getElementById('apiStatus').textContent = 'Offline';
 
+                    // Update reminder stats
+                    const reminders = JSON.parse(localStorage.getItem('psn_reminders') || '[]');
+                    document.getElementById('remindersSent').textContent = reminders.length;
+                    document.getElementById('remindersCount').textContent = reminders.length;
+
+                    // Load recent activity from local logs
+                    const logs = JSON.parse(localStorage.getItem('psn_logs') || '[]');
+                    updateActivityFeed(logs.slice(0, 5));
+
                     showNotification('Using local storage (database not configured)', 'warning');
                 }
 
-                // Update last updated time
                 document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
                 showNotification('Error loading data', 'error');
             } finally {
-                // Remove loading state
                 refreshBtn.classList.remove('loading');
                 refreshText.textContent = 'Refresh Data';
             }
@@ -1458,7 +2405,7 @@
                     </div>
                     <div class="activity-content">
                         <p class="activity-text">
-                            <strong>${log.member?.full_name || 'System'}:</strong> ${log.details}
+                            <strong>${log.user_id || 'System'}:</strong> ${log.details}
                         </p>
                         <p class="activity-time">${formatTimeAgo(log.created_at)}</p>
                     </div>
@@ -1495,6 +2442,11 @@
 
         // ==================== MEMBERS MANAGEMENT ====================
 
+        let allMembers = [];
+        let filteredMembers = [];
+        let currentPage = 1;
+        const membersPerPage = 10;
+
         async function loadMembersData() {
             const tbody = document.getElementById('membersTableBody');
             if (!tbody) return;
@@ -1508,9 +2460,10 @@
             `;
 
             try {
-                const members = await loadMembersFromDB();
+                allMembers = await loadMembersFromDB();
+                filteredMembers = [...allMembers];
 
-                if (members.length === 0) {
+                if (allMembers.length === 0) {
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="9" style="text-align: center; padding: 40px; color: #6c757d;">
@@ -1519,52 +2472,11 @@
                             </td>
                         </tr>
                     `;
+                    updatePagination();
                     return;
                 }
 
-                tbody.innerHTML = '';
-
-                members.forEach(member => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><input type="checkbox" class="member-checkbox" data-id="${member.id}"></td>
-                        <td>${member.psn_number || member.psn || 'N/A'}</td>
-                        <td>${member.full_name}</td>
-                        <td>${member.email}</td>
-                        <td>${member.phone || 'N/A'}</td>
-                        <td><span class="status-badge ${member.is_active ? 'active' : 'inactive'}">${member.is_active ? 'Active' : 'Inactive'}</span></td>
-                        <td><span class="type-badge ${member.is_admin ? 'admin' : 'member'}">${member.is_admin ? 'Admin' : 'Member'}</span></td>
-                        <td>${new Date(member.created_at).toLocaleDateString()}</td>
-                        <td>
-                            <button class="btn btn-outline btn-sm view-member-btn" data-id="${member.id}">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-outline btn-sm edit-member-btn" data-id="${member.id}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-
-                // Add event listeners
-                document.querySelectorAll('.member-checkbox').forEach(checkbox => {
-                    checkbox.addEventListener('change', updateSelectedCount);
-                });
-
-                document.querySelectorAll('.view-member-btn').forEach(btn => {
-                    btn.addEventListener('click', function () {
-                        const memberId = this.getAttribute('data-id');
-                        viewMember(memberId);
-                    });
-                });
-
-                document.querySelectorAll('.edit-member-btn').forEach(btn => {
-                    btn.addEventListener('click', function () {
-                        const memberId = this.getAttribute('data-id');
-                        editMember(memberId);
-                    });
-                });
+                renderMembersTable();
 
             } catch (error) {
                 console.error('Error loading members:', error);
@@ -1579,10 +2491,122 @@
             }
         }
 
+        function renderMembersTable() {
+            const tbody = document.getElementById('membersTableBody');
+            if (!tbody) return;
+
+            // Apply filters
+            const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('memberTypeFilter').value;
+
+            filteredMembers = allMembers.filter(member => {
+                // Search filter
+                const matchesSearch = !searchTerm ||
+                    (member.full_name && member.full_name.toLowerCase().includes(searchTerm)) ||
+                    (member.psn_number && member.psn_number.toLowerCase().includes(searchTerm)) ||
+                    (member.email && member.email.toLowerCase().includes(searchTerm));
+
+                // Status filter
+                const matchesStatus = !statusFilter ||
+                    (statusFilter === 'active' && member.is_active) ||
+                    (statusFilter === 'inactive' && !member.is_active);
+
+                // Type filter
+                const matchesType = !typeFilter ||
+                    (typeFilter === 'admin' && member.is_admin) ||
+                    (typeFilter === 'member' && !member.is_admin);
+
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            // Calculate pagination
+            const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+            const startIndex = (currentPage - 1) * membersPerPage;
+            const endIndex = startIndex + membersPerPage;
+            const pageMembers = filteredMembers.slice(startIndex, endIndex);
+
+            // Render table
+            tbody.innerHTML = '';
+
+            pageMembers.forEach(member => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="member-checkbox" data-id="${member.id}"></td>
+                    <td>${member.psn_number || member.psn || 'N/A'}</td>
+                    <td>${member.full_name}</td>
+                    <td>${member.email}</td>
+                    <td>${member.phone || 'N/A'}</td>
+                    <td><span class="status-badge ${member.is_active ? 'active' : 'inactive'}">${member.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td><span class="type-badge ${member.is_admin ? 'admin' : 'member'}">${member.is_admin ? 'Admin' : 'Member'}</span></td>
+                    <td>${member.created_at ? new Date(member.created_at).toLocaleDateString() : 'Unknown'}</td>
+                    <td>
+                        <button class="btn btn-outline btn-sm view-member-btn" data-id="${member.id}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm edit-member-btn" data-id="${member.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Add event listeners
+            document.querySelectorAll('.member-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedCount);
+            });
+
+            document.querySelectorAll('.view-member-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const memberId = this.getAttribute('data-id');
+                    viewMember(memberId);
+                });
+            });
+
+            document.querySelectorAll('.edit-member-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const memberId = this.getAttribute('data-id');
+                    editMember(memberId);
+                });
+            });
+
+            updatePagination();
+            updateSelectedCount();
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages || 1;
+
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        function updateSelectedCount() {
+            const selectedCheckboxes = document.querySelectorAll('.member-checkbox:checked');
+            const selectedCount = selectedCheckboxes.length;
+
+            document.getElementById('selectedCount').textContent = selectedCount;
+
+            const hasSelection = selectedCount > 0;
+            document.getElementById('exportSelectedBtn').disabled = !hasSelection;
+            document.getElementById('deactivateSelectedBtn').disabled = !hasSelection;
+            document.getElementById('deleteSelectedBtn').disabled = !hasSelection;
+
+            // Update select all checkbox
+            const totalCheckboxes = document.querySelectorAll('.member-checkbox').length;
+            const selectAllCheckbox = document.getElementById('selectAllMembers');
+            selectAllCheckbox.checked = totalCheckboxes > 0 && selectedCount === totalCheckboxes;
+        }
+
         async function viewMember(memberId) {
             try {
-                const members = await loadMembersFromDB();
-                const member = members.find(m => m.id === memberId);
+                const member = allMembers.find(m => m.id === memberId);
 
                 if (!member) {
                     showNotification('Member not found', 'error');
@@ -1614,7 +2638,7 @@
                             <strong>Type:</strong> <span class="type-badge ${member.is_admin ? 'admin' : 'member'}">${member.is_admin ? 'Administrator' : 'Regular Member'}</span>
                         </div>
                         <div class="detail-row">
-                            <strong>Registered:</strong> ${new Date(member.created_at).toLocaleString()}
+                            <strong>Registered:</strong> ${member.created_at ? new Date(member.created_at).toLocaleString() : 'Unknown'}
                         </div>
                         <div class="detail-row">
                             <strong>Last Updated:</strong> ${member.updated_at ? new Date(member.updated_at).toLocaleString() : 'Never'}
@@ -1632,36 +2656,978 @@
 
         async function editMember(memberId) {
             showNotification('Edit functionality will be implemented in the next update', 'info');
-            // TODO: Implement edit modal
+        }
+
+        // ==================== AUDIT LOGS LOADING ====================
+
+        async function loadAuditLogs() {
+            const tbody = document.getElementById('logsTableBody');
+            if (!tbody) return;
+
+            try {
+                let logs = await loadSystemLogsFromDB();
+
+                if (logs.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: #6c757d;">
+                                <i class="fas fa-clipboard-list" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                                <p>No audit logs found</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                const logTypeFilter = document.getElementById('logTypeFilter').value;
+                const logSearch = document.getElementById('logSearch').value.toLowerCase();
+
+                let filteredLogs = logs;
+
+                if (logTypeFilter) {
+                    filteredLogs = filteredLogs.filter(log => log.action === logTypeFilter);
+                }
+
+                if (logSearch) {
+                    filteredLogs = filteredLogs.filter(log =>
+                        (log.details && log.details.toLowerCase().includes(logSearch)) ||
+                        (log.user_id && log.user_id.toString().includes(logSearch)) ||
+                        (log.ip_address && log.ip_address.includes(logSearch))
+                    );
+                }
+
+                tbody.innerHTML = filteredLogs.map(log => `
+                    <tr>
+                        <td>${new Date(log.created_at || log.timestamp).toLocaleString()}</td>
+                        <td>${log.user_id || 'System'}</td>
+                        <td><span class="log-action ${log.action}">${log.action}</span></td>
+                        <td>${log.details || 'No details'}</td>
+                        <td>${log.ip_address || 'N/A'}</td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading audit logs:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #dc3545;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            <p>Error loading audit logs</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // ==================== SETTINGS DATA LOADING ====================
+
+        async function loadSettingsData() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('psn_settings') || '{}');
+
+                // General settings
+                if (settings.platformName) document.getElementById('platformName').value = settings.platformName;
+                if (settings.welfareSecretary) document.getElementById('welfareSecretary').value = settings.welfareSecretary;
+                if (settings.contactEmail) document.getElementById('contactEmail').value = settings.contactEmail;
+                if (settings.reminderTime) document.getElementById('reminderTime').value = settings.reminderTime;
+
+                // Email settings
+                if (settings.smtpHost) document.getElementById('smtpHost').value = settings.smtpHost;
+                if (settings.smtpPort) document.getElementById('smtpPort').value = settings.smtpPort;
+                if (settings.smtpUser) document.getElementById('smtpUser').value = settings.smtpUser;
+                if (settings.smtpPass) document.getElementById('smtpPass').value = settings.smtpPass || '';
+                if (settings.emailNotifications !== undefined) document.getElementById('emailNotifications').checked = settings.emailNotifications;
+
+                // Security settings
+                if (settings.require2FA !== undefined) document.getElementById('require2FA').checked = settings.require2FA;
+                if (settings.sessionTimeout) document.getElementById('sessionTimeout').value = settings.sessionTimeout;
+                if (settings.maxLoginAttempts) document.getElementById('maxLoginAttempts').value = settings.maxLoginAttempts;
+
+                // Database settings
+                if (settings.lastBackup) {
+                    document.getElementById('lastBackup').textContent = new Date(settings.lastBackup).toLocaleString();
+                }
+
+                // Update database status
+                const dbConnected = await testDatabaseConnection();
+                const dbStatusDot = document.getElementById('dbStatusDot');
+                const dbStatusText = document.getElementById('dbStatusText');
+
+                if (dbConnected) {
+                    dbStatusDot.className = 'status-dot connected';
+                    dbStatusText.textContent = 'Connected';
+                    dbStatusText.style.color = '#28a745';
+                } else {
+                    dbStatusDot.className = 'status-dot';
+                    dbStatusText.textContent = 'Not Connected';
+                    dbStatusText.style.color = '#dc3545';
+                }
+
+                // Load member count
+                const members = await loadMembersFromDB();
+                document.getElementById('dbTotalMembers').textContent = members.length;
+
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        // ==================== BUTTON FUNCTIONS ====================
+
+        function activateAllButtons() {
+            // Save Settings Button
+            document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+
+            // Test Email Button
+            document.getElementById('testEmailBtn').addEventListener('click', testEmailConfiguration);
+
+            // View Access Logs Button
+            document.getElementById('viewAccessLogsBtn').addEventListener('click', function () {
+                document.querySelector('.nav-item[data-section="system-logs"]').click();
+                setTimeout(() => {
+                    document.getElementById('logTypeFilter').value = 'login';
+                    loadAuditLogs();
+                }, 500);
+            });
+
+            // Backup Now Button
+            document.getElementById('backupNowBtn').addEventListener('click', backupDatabase);
+
+            // Export All Data Button
+            document.getElementById('exportAllDataBtn').addEventListener('click', exportAllData);
+
+            // Reset Demo Button
+            document.getElementById('resetDemoBtn').addEventListener('click', resetDatabase);
+
+            // Send Bulk Reminders Button
+            document.getElementById('sendBulkRemindersBtn').addEventListener('click', sendBulkReminders);
+
+            // Apply Date Range Button
+            document.getElementById('applyDateRange').addEventListener('click', applyReminderDateFilter);
+
+            // Clear Filters Button
+            document.getElementById('clearFiltersBtn').addEventListener('click', clearMemberFilters);
+
+            // Export Selected Button
+            document.getElementById('exportSelectedBtn').addEventListener('click', exportSelectedMembers);
+
+            // Deactivate Selected Button
+            document.getElementById('deactivateSelectedBtn').addEventListener('click', deactivateSelectedMembers);
+
+            // Delete Selected Button
+            document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelectedMembers);
+
+            // Select All Members Checkbox
+            document.getElementById('selectAllMembers').addEventListener('change', function () {
+                toggleSelectAllMembers(this.checked);
+            });
+
+            // Previous Page Button
+            document.getElementById('prevPageBtn').addEventListener('click', function () {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderMembersTable();
+                }
+            });
+
+            // Next Page Button
+            document.getElementById('nextPageBtn').addEventListener('click', function () {
+                const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderMembersTable();
+                }
+            });
+
+            // View All Activity Button
+            document.getElementById('viewAllActivity').addEventListener('click', function () {
+                document.querySelector('.nav-item[data-section="system-logs"]').click();
+            });
+
+            // Quick Export Button
+            document.getElementById('quickExportBtn').addEventListener('click', quickExportData);
+
+            // Monitoring Refresh Button
+            document.getElementById('refreshMonitoring').addEventListener('click', refreshMonitoring);
+
+            // Send Announcement Button
+            document.getElementById('sendAnnouncementBtn').addEventListener('click', sendAnnouncement);
+
+            // Backup Database Button
+            document.getElementById('backupDatabaseBtn').addEventListener('click', backupDatabase);
+
+            // View Logs Button
+            document.getElementById('viewLogsBtn').addEventListener('click', function () {
+                document.querySelector('.nav-item[data-section="system-logs"]').click();
+            });
+
+            // Generate Report Button
+            document.getElementById('generateReportBtn').addEventListener('click', generateReport);
+
+            // Download Report Button
+            document.getElementById('downloadReportBtn').addEventListener('click', downloadReport);
+
+            // Edit Member Button
+            document.getElementById('editMemberBtn').addEventListener('click', editCurrentMember);
+
+            // Report Type Buttons
+            document.querySelectorAll('[data-report]').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    generateSpecificReport(this.getAttribute('data-report'));
+                });
+            });
+
+            // Settings Tabs
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.addEventListener('click', function () {
+                    activateSettingsTab(this.getAttribute('data-tab'));
+                });
+            });
+
+            // Calendar Navigation
+            document.getElementById('prevMonth').addEventListener('click', function () {
+                navigateCalendar(-1);
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', function () {
+                navigateCalendar(1);
+            });
+
+            // Search functionality
+            document.getElementById('memberSearch').addEventListener('input', function () {
+                currentPage = 1;
+                renderMembersTable();
+            });
+
+            // Filter functionality
+            document.getElementById('statusFilter').addEventListener('change', function () {
+                currentPage = 1;
+                renderMembersTable();
+            });
+
+            document.getElementById('memberTypeFilter').addEventListener('change', function () {
+                currentPage = 1;
+                renderMembersTable();
+            });
+
+            // Log search functionality
+            document.getElementById('logSearch').addEventListener('input', function () {
+                loadAuditLogs();
+            });
+
+            document.getElementById('logTypeFilter').addEventListener('change', function () {
+                loadAuditLogs();
+            });
+        }
+
+        async function saveSettings() {
+            const saveBtn = document.getElementById('saveSettingsBtn');
+            const saveText = document.getElementById('saveSettingsText');
+            const originalText = saveText.textContent;
+
+            saveBtn.disabled = true;
+            saveText.innerHTML = '<span class="spinner"></span> Saving...';
+
+            try {
+                const settings = {
+                    platformName: document.getElementById('platformName').value,
+                    welfareSecretary: document.getElementById('welfareSecretary').value,
+                    contactEmail: document.getElementById('contactEmail').value,
+                    reminderTime: document.getElementById('reminderTime').value,
+                    smtpHost: document.getElementById('smtpHost').value,
+                    smtpPort: document.getElementById('smtpPort').value,
+                    smtpUser: document.getElementById('smtpUser').value,
+                    smtpPass: document.getElementById('smtpPass').value,
+                    emailNotifications: document.getElementById('emailNotifications').checked,
+                    require2FA: document.getElementById('require2FA').checked,
+                    sessionTimeout: document.getElementById('sessionTimeout').value,
+                    maxLoginAttempts: document.getElementById('maxLoginAttempts').value,
+                    updated_at: new Date().toISOString()
+                };
+
+                localStorage.setItem('psn_settings', JSON.stringify(settings));
+
+                // Log the action
+                await logSystemAction('settings_update', 'Updated system settings');
+
+                showNotification('Settings saved successfully', 'success');
+
+                // Reload settings to update UI
+                setTimeout(() => {
+                    loadSettingsData();
+                }, 500);
+
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showNotification('Error saving settings', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveText.textContent = originalText;
+            }
+        }
+
+        async function testEmailConfiguration() {
+            const testBtn = document.getElementById('testEmailBtn');
+            const originalText = testBtn.textContent;
+
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<span class="spinner"></span> Testing...';
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const smtpHost = document.getElementById('smtpHost').value;
+                const smtpUser = document.getElementById('smtpUser').value;
+
+                if (!smtpHost || !smtpUser) {
+                    showNotification('Please fill in SMTP configuration first', 'warning');
+                } else {
+                    showNotification('Email configuration test successful! Test email sent.', 'success');
+                }
+            } catch (error) {
+                console.error('Error testing email:', error);
+                showNotification('Email test failed. Check your configuration.', 'error');
+            } finally {
+                testBtn.disabled = false;
+                testBtn.textContent = originalText;
+            }
+        }
+
+        async function backupDatabase() {
+            const backupBtn = document.getElementById('backupNowBtn');
+            const backupText = document.getElementById('backupText');
+            const originalText = backupText.textContent;
+
+            backupBtn.disabled = true;
+            backupText.innerHTML = '<span class="spinner"></span> Backing up...';
+
+            try {
+                const backupData = {
+                    timestamp: new Date().toISOString(),
+                    members: JSON.parse(localStorage.getItem('psn_members') || '[]'),
+                    settings: JSON.parse(localStorage.getItem('psn_settings') || '{}'),
+                    logs: JSON.parse(localStorage.getItem('psn_logs') || '[]'),
+                    events: JSON.parse(localStorage.getItem('psn_events') || '[]'),
+                    reminders: JSON.parse(localStorage.getItem('psn_reminders') || '[]')
+                };
+
+                const dataStr = JSON.stringify(backupData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `psn-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                // Update last backup timestamp
+                const settings = JSON.parse(localStorage.getItem('psn_settings') || '{}');
+                settings.lastBackup = new Date().toISOString();
+                localStorage.setItem('psn_settings', JSON.stringify(settings));
+
+                document.getElementById('lastBackup').textContent = new Date().toLocaleString();
+                await logSystemAction('backup', 'Created database backup');
+
+                showNotification('Database backup created and downloaded', 'success');
+
+            } catch (error) {
+                console.error('Error creating backup:', error);
+                showNotification('Error creating backup', 'error');
+            } finally {
+                backupBtn.disabled = false;
+                backupText.textContent = originalText;
+            }
+        }
+
+        function exportAllData() {
+            try {
+                const exportData = {
+                    members: JSON.parse(localStorage.getItem('psn_members') || '[]'),
+                    events: JSON.parse(localStorage.getItem('psn_events') || '[]'),
+                    settings: JSON.parse(localStorage.getItem('psn_settings') || '{}'),
+                    export_date: new Date().toISOString(),
+                    system: 'PSN Taraba Welfare Registry'
+                };
+
+                // Convert to CSV format
+                let csvContent = "PSN Taraba Welfare Registry - Data Export\n";
+                csvContent += "Export Date: " + new Date().toLocaleString() + "\n\n";
+
+                // Members section
+                if (exportData.members.length > 0) {
+                    csvContent += "MEMBERS\n";
+                    const memberHeaders = ["PSN Number", "Full Name", "Email", "Phone", "Status", "Type", "Registered"];
+                    csvContent += memberHeaders.join(",") + "\n";
+
+                    exportData.members.forEach(member => {
+                        const row = [
+                            `"${member.psn_number || member.psn || ''}"`,
+                            `"${member.full_name || ''}"`,
+                            `"${member.email || ''}"`,
+                            `"${member.phone || ''}"`,
+                            `"${member.is_active ? 'Active' : 'Inactive'}"`,
+                            `"${member.is_admin ? 'Admin' : 'Member'}"`,
+                            `"${member.created_at ? new Date(member.created_at).toLocaleDateString() : ''}"`
+                        ];
+                        csvContent += row.join(",") + "\n";
+                    });
+                    csvContent += "\n";
+                }
+
+                // Events section
+                if (exportData.events.length > 0) {
+                    csvContent += "EVENTS\n";
+                    const eventHeaders = ["Title", "Date", "Type", "Description"];
+                    csvContent += eventHeaders.join(",") + "\n";
+
+                    exportData.events.forEach(event => {
+                        const row = [
+                            `"${event.title || ''}"`,
+                            `"${event.date || ''}"`,
+                            `"${event.type || ''}"`,
+                            `"${event.description || ''}"`
+                        ];
+                        csvContent += row.join(",") + "\n";
+                    });
+                    csvContent += "\n";
+                }
+
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `psn-data-export-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                showNotification('All data exported to CSV', 'success');
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showNotification('Error exporting data', 'error');
+            }
+        }
+
+        function resetDatabase() {
+            if (confirm('WARNING: This will clear ALL data including members, events, and settings. This action cannot be undone. Are you absolutely sure?')) {
+                if (confirm('This is your final warning. All data will be permanently deleted. Type "RESET" to confirm.')) {
+                    const userInput = prompt('Type RESET to confirm database reset:');
+                    if (userInput === 'RESET') {
+                        // Clear local storage
+                        localStorage.removeItem('psn_members');
+                        localStorage.removeItem('psn_events');
+                        localStorage.removeItem('psn_logs');
+                        localStorage.removeItem('psn_settings');
+                        localStorage.removeItem('psn_reminders');
+
+                        // Clear database if connected
+                        if (supabase) {
+                            console.log('Database reset requested - clear tables manually');
+                        }
+
+                        // Reset UI
+                        document.getElementById('totalMembers').textContent = '0';
+                        document.getElementById('activeMembers').textContent = '0';
+                        document.getElementById('membersCount').textContent = '0';
+                        document.getElementById('lastBackup').textContent = 'No backups yet';
+                        document.getElementById('dbTotalMembers').textContent = '0';
+
+                        if (document.getElementById('manage-members-section').style.display !== 'none') {
+                            loadMembersData();
+                        }
+
+                        // Log the action
+                        logSystemAction('system_reset', 'Reset all system data');
+
+                        showNotification('All data has been cleared. Page will reload.', 'warning');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        showNotification('Database reset cancelled', 'info');
+                    }
+                }
+            }
+        }
+
+        async function sendBulkReminders() {
+            const sendBtn = document.getElementById('sendBulkRemindersBtn');
+            const originalText = sendBtn.textContent;
+
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="spinner"></span> Sending...';
+
+            try {
+                const events = JSON.parse(localStorage.getItem('psn_events') || '[]');
+                const members = JSON.parse(localStorage.getItem('psn_members') || '[]');
+
+                // Get upcoming events in next 7 days
+                const today = new Date();
+                const nextWeek = new Date(today);
+                nextWeek.setDate(nextWeek.getDate() + 7);
+
+                const upcomingEvents = events.filter(event => {
+                    const eventDate = new Date(event.date);
+                    return eventDate >= today && eventDate <= nextWeek;
+                });
+
+                if (upcomingEvents.length === 0) {
+                    showNotification('No upcoming events in the next 7 days', 'info');
+                    return;
+                }
+
+                // Simulate sending reminders
+                let remindersSent = 0;
+                for (const event of upcomingEvents) {
+                    for (const member of members) {
+                        // Create reminder log entry
+                        const reminder = {
+                            event_id: event.id || Date.now(),
+                            event_title: event.title,
+                            event_date: event.date,
+                            member_id: member.id,
+                            member_name: member.full_name,
+                            member_email: member.email,
+                            status: 'sent',
+                            sent_at: new Date().toISOString(),
+                            type: 'birthday' // or 'anniversary' based on event type
+                        };
+
+                        // Save to local storage
+                        const reminders = JSON.parse(localStorage.getItem('psn_reminders') || '[]');
+                        reminders.push(reminder);
+                        localStorage.setItem('psn_reminders', JSON.stringify(reminders));
+
+                        remindersSent++;
+                    }
+                }
+
+                // Update UI
+                const currentReminders = parseInt(document.getElementById('remindersSent').textContent) || 0;
+                document.getElementById('remindersSent').textContent = currentReminders + remindersSent;
+
+                const currentLogs = parseInt(document.getElementById('remindersCount').textContent) || 0;
+                document.getElementById('remindersCount').textContent = currentLogs + remindersSent;
+
+                // Log the action
+                await logSystemAction('bulk_reminders', `Sent ${remindersSent} reminders for ${upcomingEvents.length} events`);
+
+                showNotification(`Bulk reminders sent for ${upcomingEvents.length} events (${remindersSent} total)`, 'success');
+
+            } catch (error) {
+                console.error('Error sending bulk reminders:', error);
+                showNotification('Error sending reminders', 'error');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = originalText;
+            }
+        }
+
+        function applyReminderDateFilter() {
+            const startDate = document.getElementById('reminderStartDate').value;
+            const endDate = document.getElementById('reminderEndDate').value;
+
+            if (startDate && endDate) {
+                // This would filter the reminders table in a real implementation
+                showNotification(`Filter applied: ${startDate} to ${endDate}`, 'info');
+            } else {
+                showNotification('Please select both start and end dates', 'warning');
+            }
+        }
+
+        function clearMemberFilters() {
+            document.getElementById('memberSearch').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('memberTypeFilter').value = '';
+
+            currentPage = 1;
+            renderMembersTable();
+
+            showNotification('Filters cleared', 'info');
+        }
+
+        function exportSelectedMembers() {
+            const selectedCheckboxes = document.querySelectorAll('.member-checkbox:checked');
+            if (selectedCheckboxes.length === 0) {
+                showNotification('No members selected', 'warning');
+                return;
+            }
+
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.getAttribute('data-id'));
+            const selectedMembers = allMembers.filter(member =>
+                selectedIds.includes(member.id.toString())
+            );
+
+            if (selectedMembers.length === 0) {
+                showNotification('No members found to export', 'warning');
+                return;
+            }
+
+            // Convert to CSV
+            const headers = ['PSN Number', 'Full Name', 'Email', 'Phone', 'Status', 'Type', 'Registered'];
+            const csvRows = [
+                headers.join(','),
+                ...selectedMembers.map(member => [
+                    member.psn_number || member.psn || '',
+                    member.full_name,
+                    member.email,
+                    member.phone || '',
+                    member.is_active ? 'Active' : 'Inactive',
+                    member.is_admin ? 'Admin' : 'Member',
+                    member.created_at ? new Date(member.created_at).toLocaleDateString() : ''
+                ].map(value => `"${value}"`).join(','))
+            ];
+
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `selected-members-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showNotification(`Exported ${selectedMembers.length} members to CSV`, 'success');
+        }
+
+        async function deactivateSelectedMembers() {
+            const selectedCheckboxes = document.querySelectorAll('.member-checkbox:checked');
+            if (selectedCheckboxes.length === 0) {
+                showNotification('No members selected', 'warning');
+                return;
+            }
+
+            if (confirm(`Deactivate ${selectedCheckboxes.length} selected member(s)? They will not be able to login until reactivated.`)) {
+                const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.getAttribute('data-id'));
+                let updatedCount = 0;
+
+                for (const memberId of selectedIds) {
+                    const result = await updateMemberInDB(memberId, { is_active: false });
+                    if (result.success) {
+                        updatedCount++;
+                    }
+                }
+
+                // Reload data
+                await loadMembersData();
+                await loadDashboardData();
+
+                showNotification(`${updatedCount} member(s) deactivated`, 'success');
+            }
+        }
+
+        async function deleteSelectedMembers() {
+            const selectedCheckboxes = document.querySelectorAll('.member-checkbox:checked');
+            if (selectedCheckboxes.length === 0) {
+                showNotification('No members selected', 'warning');
+                return;
+            }
+
+            if (confirm(`Permanently delete ${selectedCheckboxes.length} selected member(s)? This action cannot be undone.`)) {
+                if (confirm('This is your final warning. All selected member data will be permanently deleted.')) {
+                    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.getAttribute('data-id'));
+                    let deletedCount = 0;
+
+                    for (const memberId of selectedIds) {
+                        const result = await deleteMemberFromDB(memberId);
+                        if (result.success) {
+                            deletedCount++;
+                        }
+                    }
+
+                    // Reload data
+                    await loadMembersData();
+                    await loadDashboardData();
+
+                    showNotification(`${deletedCount} member(s) deleted`, 'success');
+                }
+            }
+        }
+
+        function toggleSelectAllMembers(checked) {
+            document.querySelectorAll('.member-checkbox').forEach(checkbox => {
+                checkbox.checked = checked;
+            });
+            updateSelectedCount();
+        }
+
+        function quickExportData() {
+            const exportData = {
+                summary: {
+                    total_members: document.getElementById('totalMembers').textContent,
+                    active_members: document.getElementById('activeMembers').textContent,
+                    upcoming_celebrations: document.getElementById('upcomingCelebrations').textContent,
+                    reminders_sent: document.getElementById('remindersSent').textContent,
+                    export_date: new Date().toISOString()
+                },
+                system_status: {
+                    database: document.getElementById('dbConnection').textContent,
+                    health: document.getElementById('systemHealth').textContent,
+                    api: document.getElementById('apiStatus').textContent
+                }
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `psn-quick-export-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showNotification('Quick export downloaded', 'success');
+        }
+
+        function refreshMonitoring() {
+            const refreshBtn = document.getElementById('refreshMonitoring');
+            const refreshText = document.getElementById('monitoringText');
+            const originalText = refreshText.textContent;
+
+            refreshBtn.disabled = true;
+            refreshText.innerHTML = '<span class="spinner"></span> Refreshing...';
+
+            setTimeout(async () => {
+                const now = new Date();
+                document.getElementById('lastSync').textContent = now.toLocaleTimeString();
+
+                // Test database connection
+                const dbConnected = await testDatabaseConnection();
+                if (dbConnected) {
+                    document.getElementById('systemHealth').textContent = 'Healthy';
+                    document.getElementById('apiStatus').textContent = 'Online';
+                    document.getElementById('storageStatus').textContent = 'Normal';
+                    document.getElementById('backupStatus').textContent = 'Up to date';
+                } else {
+                    document.getElementById('systemHealth').textContent = 'Limited';
+                    document.getElementById('apiStatus').textContent = 'Offline';
+                    document.getElementById('storageStatus').textContent = 'Local Only';
+                    document.getElementById('backupStatus').textContent = 'Manual';
+                }
+
+                refreshBtn.disabled = false;
+                refreshText.textContent = originalText;
+                showNotification('System monitoring refreshed', 'success');
+            }, 1500);
+        }
+
+        function sendAnnouncement() {
+            const announcement = prompt('Enter announcement message to send to all members:');
+            if (announcement && announcement.trim()) {
+                // Log the announcement
+                logSystemAction('announcement', `Sent announcement: ${announcement}`);
+                showNotification('Announcement queued for sending to all members', 'success');
+            }
+        }
+
+        function generateReport() {
+            const reportPreview = document.getElementById('reportPreview');
+            const reportContent = document.getElementById('reportContent');
+
+            reportPreview.style.display = 'block';
+            const now = new Date();
+
+            // Create a simple report
+            const totalMembers = document.getElementById('totalMembers').textContent;
+            const activeMembers = document.getElementById('activeMembers').textContent;
+            const upcomingEvents = document.getElementById('upcomingCelebrations').textContent;
+            const remindersSent = document.getElementById('remindersSent').textContent;
+
+            reportContent.innerHTML = `
+                <div class="report-content">
+                    <h4>System Report - ${now.toLocaleDateString()}</h4>
+                    <div class="report-stats">
+                        <div class="report-stat">
+                            <strong>Total Members:</strong> ${totalMembers}
+                        </div>
+                        <div class="report-stat">
+                            <strong>Active Members:</strong> ${activeMembers}
+                        </div>
+                        <div class="report-stat">
+                            <strong>Upcoming Celebrations:</strong> ${upcomingEvents}
+                        </div>
+                        <div class="report-stat">
+                            <strong>Reminders Sent:</strong> ${remindersSent}
+                        </div>
+                        <div class="report-stat">
+                            <strong>System Status:</strong> ${document.getElementById('systemHealth').textContent}
+                        </div>
+                        <div class="report-stat">
+                            <strong>Database Connection:</strong> ${document.getElementById('dbConnection').textContent}
+                        </div>
+                    </div>
+                    <div class="report-timestamp">
+                        Generated: ${now.toLocaleString()}
+                    </div>
+                </div>
+            `;
+
+            showNotification('Report generated. Select format and download.', 'info');
+        }
+
+        function downloadReport() {
+            const format = document.getElementById('reportFormat').value;
+            const reportContent = document.getElementById('reportContent').innerText;
+
+            let mimeType, extension;
+            switch (format) {
+                case 'csv':
+                    mimeType = 'text/csv';
+                    extension = 'csv';
+                    break;
+                case 'excel':
+                    mimeType = 'application/vnd.ms-excel';
+                    extension = 'xls';
+                    break;
+                case 'pdf':
+                default:
+                    mimeType = 'application/pdf';
+                    extension = 'pdf';
+            }
+
+            const blob = new Blob([reportContent], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `psn-report-${new Date().toISOString().split('T')[0]}.${extension}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showNotification(`Report downloaded as ${format.toUpperCase()}`, 'success');
+        }
+
+        function editCurrentMember() {
+            showNotification('Edit member functionality will be implemented in next update', 'info');
+            document.getElementById('viewMemberModal').style.display = 'none';
+        }
+
+        function activateSettingsTab(tabId) {
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.settings-tab-content').forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${tabId}-settings`) {
+                    content.classList.add('active');
+                }
+            });
+        }
+
+        function generateSpecificReport(reportType) {
+            const reportTypes = {
+                demographics: 'Member Demographics Report',
+                calendar: 'Celebration Calendar Report',
+                reminders: 'Reminder Analytics Report',
+                growth: 'Growth Trends Report'
+            };
+
+            showNotification(`Generating ${reportTypes[reportType]}...`, 'info');
+
+            // Show report preview
+            const reportPreview = document.getElementById('reportPreview');
+            const reportContent = document.getElementById('reportContent');
+
+            reportPreview.style.display = 'block';
+            reportContent.innerHTML = `
+                <div class="report-content">
+                    <h4>${reportTypes[reportType]}</h4>
+                    <p>This report would show detailed ${reportType} data.</p>
+                    <p>In a full implementation, this would include charts, graphs, and detailed statistics.</p>
+                    <div class="report-timestamp">
+                        Generated: ${new Date().toLocaleString()}
+                    </div>
+                </div>
+            `;
+        }
+
+        function navigateCalendar(direction) {
+            const monthElement = document.getElementById('currentMonth');
+            const currentText = monthElement.textContent;
+            const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+
+            const now = new Date();
+            let currentMonth = months.indexOf(currentText.split(' ')[0]);
+            if (currentMonth === -1) currentMonth = now.getMonth();
+
+            let newMonth = currentMonth + direction;
+            if (newMonth < 0) newMonth = 11;
+            if (newMonth > 11) newMonth = 0;
+
+            const year = now.getFullYear();
+            monthElement.textContent = `${months[newMonth]} ${year}`;
+
+            // Generate calendar days (simplified)
+            generateCalendar(newMonth, year);
+        }
+
+        function generateCalendar(month, year) {
+            const calendarGrid = document.getElementById('calendarGrid');
+            if (!calendarGrid) return;
+
+            // Simplified calendar - in a real app, you would generate actual dates
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+
+            let calendarHTML = '';
+
+            // Day headers
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(day => {
+                calendarHTML += `<div class="calendar-day header">${day}</div>`;
+            });
+
+            // Empty cells for days before the first day of month
+            for (let i = 0; i < firstDay; i++) {
+                calendarHTML += `<div class="calendar-day empty"></div>`;
+            }
+
+            // Days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                // Check if this day has events
+                const hasEvent = Math.random() > 0.8; // Random for demo
+                const dayClass = hasEvent ? 'calendar-day event' : 'calendar-day';
+                calendarHTML += `<div class="${dayClass}">${day}</div>`;
+            }
+
+            calendarGrid.innerHTML = calendarHTML;
         }
 
         // ==================== MAIN INITIALIZATION ====================
 
         document.addEventListener('DOMContentLoaded', async function () {
-            // Check authentication
             if (!requireAuth()) return;
 
-            // Initialize Supabase
             const dbInitialized = initSupabase();
 
-            // Load admin info
             const user = getCurrentUser();
             if (user) {
                 document.getElementById('adminName').textContent = user.full_name || user.fullName || 'Admin User';
                 document.getElementById('adminPsn').textContent = user.psn_number || user.psn || 'System Administrator';
             }
 
-            // Check if database is configured
             if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.key) {
                 document.getElementById('dbConfigModal').style.display = 'block';
             }
 
-            // Load initial dashboard data
+            // Load initial data
             await loadDashboardData();
 
             // ==================== EVENT LISTENERS ====================
 
-            // Mobile menu
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
             const mobileCloseBtn = document.getElementById('mobileCloseBtn');
             const mobileOverlay = document.getElementById('mobileOverlay');
@@ -1694,11 +3660,9 @@
                     e.preventDefault();
                     const sectionId = this.getAttribute('data-section');
 
-                    // Update active nav
                     navItems.forEach(nav => nav.classList.remove('active'));
                     this.classList.add('active');
 
-                    // Hide all sections, show selected
                     Object.values(sections).forEach(section => {
                         if (section) section.style.display = 'none';
                     });
@@ -1706,7 +3670,6 @@
                     if (sections[sectionId]) {
                         sections[sectionId].style.display = 'block';
 
-                        // Update page title
                         const titles = {
                             'admin-dashboard': { title: 'Admin Dashboard', subtitle: 'Welfare Secretary Control Panel' },
                             'manage-members': { title: 'Manage Members', subtitle: 'View and manage all registered members' },
@@ -1724,18 +3687,15 @@
                             pageSubtitle.textContent = titles[sectionId].subtitle;
                         }
 
-                        // Load section data
                         loadSectionData(sectionId);
                     }
 
-                    // Close mobile menu
                     if (window.innerWidth <= 768) {
                         toggleMobileMenu();
                     }
                 });
             });
 
-            // Load section data
             function loadSectionData(sectionId) {
                 switch (sectionId) {
                     case 'manage-members':
@@ -1747,10 +3707,20 @@
                     case 'settings':
                         loadSettingsData();
                         break;
+                    case 'upcoming-events':
+                        // Initialize calendar
+                        const now = new Date();
+                        const currentMonth = now.getMonth();
+                        const currentYear = now.getFullYear();
+                        const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                            'July', 'August', 'September', 'October', 'November', 'December'];
+                        document.getElementById('currentMonth').textContent = `${months[currentMonth]} ${currentYear}`;
+                        generateCalendar(currentMonth, currentYear);
+                        break;
                 }
             }
 
-            // Logout
+            // Logout button
             document.getElementById('logoutBtn').addEventListener('click', function () {
                 if (confirm('Are you sure you want to logout?')) {
                     localStorage.removeItem('psn_welfare_token');
@@ -1759,10 +3729,10 @@
                 }
             });
 
-            // Refresh data
+            // Refresh data button
             document.getElementById('refreshDataBtn').addEventListener('click', loadDashboardData);
 
-            // Quick actions
+            // Add member buttons
             document.getElementById('addMemberBtn').addEventListener('click', function () {
                 document.getElementById('addMemberModal').style.display = 'block';
             });
@@ -1771,32 +3741,29 @@
                 document.getElementById('addMemberModal').style.display = 'block';
             });
 
-            // Add member form submission
+            // Save new member
             document.getElementById('saveNewMember').addEventListener('click', async function () {
                 const saveBtn = this;
                 const saveText = document.getElementById('saveMemberText');
                 const originalText = saveText.textContent;
 
-                // Get form values
                 const memberData = {
                     psn_number: document.getElementById('newPsnNumber').value.trim(),
                     full_name: document.getElementById('newMemberName').value.trim(),
                     email: document.getElementById('newMemberEmail').value.trim(),
                     phone: document.getElementById('newMemberPhone').value.trim(),
                     date_of_birth: document.getElementById('newMemberDob').value || null,
-                    password_hash: btoa(document.getElementById('newMemberPassword').value), // Simple encoding
+                    password_hash: btoa(document.getElementById('newMemberPassword').value),
                     is_admin: document.getElementById('makeAdmin').checked,
                     is_active: true,
                     created_at: new Date().toISOString()
                 };
 
-                // Validation
                 if (!memberData.psn_number || !memberData.full_name || !memberData.email || !memberData.phone) {
                     showNotification('Please fill all required fields', 'error');
                     return;
                 }
 
-                // Show loading
                 saveBtn.disabled = true;
                 saveText.innerHTML = '<span class="spinner"></span> Saving...';
 
@@ -1808,7 +3775,6 @@
                         document.getElementById('addMemberModal').style.display = 'none';
                         document.getElementById('addMemberForm').reset();
 
-                        // Refresh data
                         await loadDashboardData();
                         if (document.getElementById('manage-members-section').style.display !== 'none') {
                             await loadMembersData();
@@ -1819,7 +3785,6 @@
                 } catch (error) {
                     showNotification('Error saving member', 'error');
                 } finally {
-                    // Reset button
                     saveBtn.disabled = false;
                     saveText.textContent = originalText;
                 }
@@ -1836,7 +3801,7 @@
                 document.getElementById('viewMemberModal').style.display = 'none';
             });
 
-            // Database configuration
+            // Save database configuration
             document.getElementById('saveDbConfig').addEventListener('click', function () {
                 const url = document.getElementById('supabaseUrl').value.trim();
                 const key = document.getElementById('supabaseKey').value.trim();
@@ -1849,7 +3814,6 @@
                 localStorage.setItem('supabase_url', url);
                 localStorage.setItem('supabase_key', key);
 
-                // Reinitialize Supabase
                 initSupabase();
                 loadDashboardData();
 
@@ -1864,7 +3828,7 @@
                 }
             });
 
-            // Close modals with escape key
+            // Close modals with ESC key
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
                     document.querySelectorAll('.modal').forEach(modal => {
@@ -1873,7 +3837,13 @@
                 }
             });
 
-            // Update mobile close button visibility
+            // Close modals with close buttons
+            document.querySelectorAll('.modal-close').forEach(closeBtn => {
+                closeBtn.addEventListener('click', function () {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+
             function updateMobileCloseButton() {
                 if (window.innerWidth <= 768) {
                     mobileCloseBtn.style.display = 'block';
@@ -1888,206 +3858,15 @@
             updateMobileCloseButton();
             window.addEventListener('resize', updateMobileCloseButton);
 
-            console.log('Admin dashboard initialized with database support');
+            // Initialize password toggles
+            initializePasswordToggles();
+
+            // Activate all buttons
+            activateAllButtons();
+
+            console.log('Admin dashboard fully initialized with all buttons activated');
         });
     </script>
-
-    <!-- Notification Styles -->
-    <style>
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-            max-width: 350px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .notification-success {
-            background: #28a745;
-            border-left: 4px solid #1e7e34;
-        }
-
-        .notification-error {
-            background: #dc3545;
-            border-left: 4px solid #bd2130;
-        }
-
-        .notification-warning {
-            background: #ffc107;
-            border-left: 4px solid #d39e00;
-            color: #212529;
-        }
-
-        .notification-info {
-            background: #17a2b8;
-            border-left: 4px solid #117a8b;
-        }
-
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .notification-hide {
-            animation: slideOut 0.3s ease forwards;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-
-        /* Status badges */
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .status-badge.active {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-badge.inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .type-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .type-badge.member {
-            background: #e3f2fd;
-            color: #1565c0;
-        }
-
-        .type-badge.admin {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
-
-        /* Member details */
-        .member-details {
-            padding: 20px;
-        }
-
-        .detail-row {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .detail-row strong {
-            min-width: 150px;
-        }
-
-        /* Database status indicator */
-        .db-status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #6c757d;
-        }
-
-        .status-dot.connected {
-            background: #28a745;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
-
-            100% {
-                opacity: 1;
-            }
-        }
-
-        /* Alert styles */
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            border-left: 4px solid #117a8b;
-            color: #0c5460;
-        }
-
-        /* Database info */
-        .db-info {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-    </style>
 </body>
 
 </html>

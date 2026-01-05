@@ -59,6 +59,7 @@
 
         .form-group {
             margin-bottom: 1.5rem;
+            position: relative;
         }
 
         .form-group label {
@@ -69,11 +70,12 @@
 
         .form-control {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px 40px 12px 16px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 1rem;
             font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
         }
 
         .btn {
@@ -269,6 +271,41 @@
         .auth-footer a:hover {
             text-decoration: underline;
         }
+
+        /* Password toggle button styles - FIXED */
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1rem;
+            z-index: 10;
+            height: 30px;
+            width: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle:hover {
+            color: #2c5aa0;
+        }
+
+        /* Ensure password fields have extra padding on right */
+        .form-control[type="password"],
+        .form-control[type="text"] {
+            padding-right: 40px;
+        }
+
+        /* Make sure form-group has proper positioning */
+        .form-group {
+            position: relative;
+        }
     </style>
 </head>
 
@@ -281,7 +318,7 @@
             </div>
 
             <div class="auth-body">
-                <a href="/" class="back-home">
+                <a href="/index.html" class="back-home">
                     <i class="fas fa-arrow-left"></i> Back to Home
                 </a>
 
@@ -336,8 +373,13 @@
                     <!-- Password -->
                     <div class="form-group">
                         <label for="password">Password <span class="required">*</span></label>
-                        <input type="password" id="password" class="form-control" placeholder="Create a strong password"
-                            required minlength="8">
+                        <div style="position: relative;">
+                            <input type="password" id="password" class="form-control"
+                                placeholder="Create a strong password" required minlength="8">
+                            <button type="button" class="password-toggle" id="passwordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                         <div class="password-strength">
                             <div class="strength-meter">
                                 <div class="strength-fill" id="strengthFill"></div>
@@ -351,8 +393,13 @@
 
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
-                        <input type="password" id="confirmPassword" class="form-control"
-                            placeholder="Re-enter your password" required>
+                        <div style="position: relative;">
+                            <input type="password" id="confirmPassword" class="form-control"
+                                placeholder="Re-enter your password" required>
+                            <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                         <div class="form-text error" id="passwordError"></div>
                     </div>
 
@@ -394,7 +441,7 @@
                 </form>
 
                 <div class="auth-footer">
-                    Already have an account? <a href="/login">Login here</a>
+                    Already have an account? <a href="/pages/login.html">Login here</a>
                 </div>
             </div>
         </div>
@@ -426,6 +473,38 @@
                 console.error('Failed to initialize Supabase:', error);
                 showError('Database connection failed. Using local storage.');
                 return false;
+            }
+        }
+
+        // ==================== PASSWORD TOGGLE FUNCTIONS ====================
+
+        function initializePasswordToggles() {
+            // Password field toggle
+            const passwordToggle = document.getElementById('passwordToggle');
+            const passwordInput = document.getElementById('password');
+
+            if (passwordToggle && passwordInput) {
+                passwordToggle.addEventListener('click', function () {
+                    const type = passwordInput.type === 'password' ? 'text' : 'password';
+                    passwordInput.type = type;
+                    const icon = this.querySelector('i');
+                    icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                    passwordInput.focus();
+                });
+            }
+
+            // Confirm password field toggle
+            const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+
+            if (confirmPasswordToggle && confirmPasswordInput) {
+                confirmPasswordToggle.addEventListener('click', function () {
+                    const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+                    confirmPasswordInput.type = type;
+                    const icon = this.querySelector('i');
+                    icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                    confirmPasswordInput.focus();
+                });
             }
         }
 
@@ -990,9 +1069,13 @@
                     document.getElementById('strengthText').textContent = 'Password strength';
                     document.getElementById('strengthText').style.color = '#7f8c8d';
 
+                    // Reset password toggle icons
+                    document.getElementById('passwordToggle').querySelector('i').className = 'fas fa-eye';
+                    document.getElementById('confirmPasswordToggle').querySelector('i').className = 'fas fa-eye';
+
                     // Redirect to login after 3 seconds
                     setTimeout(() => {
-                        window.location.href = '/login';
+                        window.location.href = '/pages/login.html';
                     }, 3000);
 
                 } else {
@@ -1012,6 +1095,9 @@
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize password toggles - MUST be called before any other initialization
+            initializePasswordToggles();
+
             // Initialize Supabase
             const dbInitialized = initSupabase();
 
@@ -1079,6 +1165,11 @@
                     this.parentElement.parentElement.style.borderColor = '';
                 }
             });
+
+            // Fix for password toggle buttons - ensure they work immediately
+            setTimeout(() => {
+                initializePasswordToggles();
+            }, 100);
         });
     </script>
 </body>
