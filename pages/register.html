@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!DOCTYPE html>
-<html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,8 +12,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Include Supabase JS -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-    <!-- Add inline styles as fallback -->
     <style>
         /* Temporary styles in case CSS doesn't load */
         body {
@@ -96,6 +94,181 @@
             width: 100%;
             padding: 14px;
         }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-loading .spinner {
+            display: inline-block;
+        }
+
+        /* Alert styles */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.show {
+            display: flex;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #1e7e34;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #bd2130;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #117a8b;
+        }
+
+        /* Form validation */
+        .error {
+            border-color: #e74c3c !important;
+        }
+
+        .form-text.error {
+            color: #e74c3c;
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        /* Password strength */
+        .password-strength {
+            margin-top: 10px;
+        }
+
+        .strength-meter {
+            height: 5px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .strength-fill.strength-weak {
+            width: 25%;
+            background: #e74c3c;
+        }
+
+        .strength-fill.strength-fair {
+            width: 50%;
+            background: #f39c12;
+        }
+
+        .strength-fill.strength-good {
+            width: 75%;
+            background: #3498db;
+        }
+
+        .strength-fill.strength-strong {
+            width: 100%;
+            background: #2ecc71;
+        }
+
+        .strength-text {
+            font-size: 0.875rem;
+            color: #7f8c8d;
+        }
+
+        /* Back home link */
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #2c5aa0;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .back-home:hover {
+            text-decoration: underline;
+        }
+
+        /* Consent group */
+        .consent-group {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .consent-text {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        .consent-text label {
+            cursor: pointer;
+            margin: 0;
+        }
+
+        /* Form actions */
+        .form-actions {
+            margin-top: 30px;
+        }
+
+        /* Auth footer */
+        .auth-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #6c757d;
+        }
+
+        .auth-footer a {
+            color: #2c5aa0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -108,17 +281,24 @@
             </div>
 
             <div class="auth-body">
-                <a href="../index.html" class="back-home">
+                <a href="/" class="back-home">
                     <i class="fas fa-arrow-left"></i> Back to Home
                 </a>
 
                 <!-- Success/Error Messages -->
                 <div class="alert alert-success" id="successAlert">
-                    Registration successful! Redirecting to login...
+                    <i class="fas fa-check-circle"></i>
+                    <span id="successMessage">Registration successful! Redirecting to login...</span>
                 </div>
 
                 <div class="alert alert-error" id="errorAlert">
-                    Please check the form for errors.
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorMessage">Please check the form for errors.</span>
+                </div>
+
+                <div class="alert alert-info" id="infoAlert">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="infoMessage">Checking database connection...</span>
                 </div>
 
                 <form id="registerForm" class="auth-form">
@@ -143,11 +323,14 @@
                         <label for="email">Email Address <span class="required">*</span></label>
                         <input type="email" id="email" class="form-control" placeholder="your.email@example.com"
                             required>
+                        <div class="form-text" id="emailValidation"></div>
                     </div>
 
                     <div class="form-group">
                         <label for="phone">Phone Number <span class="required">*</span></label>
-                        <input type="tel" id="phone" class="form-control" placeholder="0803XXXXXXX" required>
+                        <input type="tel" id="phone" class="form-control" placeholder="0803XXXXXXX" required
+                            pattern="[0-9]{11}" title="Please enter a valid 11-digit Nigerian phone number">
+                        <div class="form-text">Enter your 11-digit Nigerian phone number</div>
                     </div>
 
                     <!-- Password -->
@@ -160,6 +343,9 @@
                                 <div class="strength-fill" id="strengthFill"></div>
                             </div>
                             <div class="strength-text" id="strengthText">Password strength</div>
+                        </div>
+                        <div class="form-text">
+                            Minimum 8 characters with uppercase, lowercase, number, and special character
                         </div>
                     </div>
 
@@ -174,11 +360,13 @@
                     <div class="form-group">
                         <label for="dateOfBirth">Date of Birth</label>
                         <input type="date" id="dateOfBirth" class="form-control">
+                        <div class="form-text">For birthday celebration notifications</div>
                     </div>
 
                     <div class="form-group">
                         <label for="weddingDate">Wedding Anniversary (if applicable)</label>
                         <input type="date" id="weddingDate" class="form-control">
+                        <div class="form-text">For anniversary celebration notifications</div>
                     </div>
 
                     <!-- Data Protection Consent -->
@@ -199,38 +387,355 @@
                     <!-- Submit Button -->
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
-                            <i class="fas fa-user-plus"></i> Register Account
+                            <span class="btn-text">Register Account</span>
+                            <span class="spinner" style="display: none;"></span>
                         </button>
                     </div>
                 </form>
 
                 <div class="auth-footer">
-                    Already have an account? <a href="/pages/login.html">Login here</a>
+                    Already have an account? <a href="/login">Login here</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Link to utility scripts -->
-    <script src="../scripts/utils.js"></script>
-    <script src="../scripts/api.js"></script>
-
     <!-- Registration-specific script -->
     <script>
-        // DOM Elements
-        const registerForm = document.getElementById('registerForm');
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-        const strengthFill = document.getElementById('strengthFill');
-        const strengthText = document.getElementById('strengthText');
-        const passwordError = document.getElementById('passwordError');
-        const submitBtn = document.getElementById('submitBtn');
-        const successAlert = document.getElementById('successAlert');
-        const errorAlert = document.getElementById('errorAlert');
+        // ==================== SUPABASE CONFIGURATION ====================
+        const SUPABASE_CONFIG = {
+            url: 'https://your-project.supabase.co', // REPLACE with your Supabase URL
+            key: 'your-anon-key' // REPLACE with your Supabase anon key
+        };
+
+        // Initialize Supabase client
+        let supabase = null;
+
+        function initSupabase() {
+            if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.key) {
+                console.warn('Supabase credentials not configured');
+                showInfo('Registration will use local storage (database not configured)');
+                return false;
+            }
+
+            try {
+                supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+                console.log('Supabase client initialized');
+                return true;
+            } catch (error) {
+                console.error('Failed to initialize Supabase:', error);
+                showError('Database connection failed. Using local storage.');
+                return false;
+            }
+        }
+
+        // ==================== DATABASE FUNCTIONS ====================
+
+        // Check if PSN number already exists
+        async function checkPsnExists(psnNumber) {
+            if (!supabase) return false;
+
+            try {
+                const { data, error } = await supabase
+                    .from('members')
+                    .select('psn_number')
+                    .eq('psn_number', psnNumber)
+                    .single();
+
+                return !error && data !== null;
+            } catch (error) {
+                console.error('Error checking PSN number:', error);
+                return false;
+            }
+        }
+
+        // Check if email already exists
+        async function checkEmailExists(email) {
+            if (!supabase) return false;
+
+            try {
+                const { data, error } = await supabase
+                    .from('members')
+                    .select('email')
+                    .eq('email', email.toLowerCase())
+                    .single();
+
+                return !error && data !== null;
+            } catch (error) {
+                console.error('Error checking email:', error);
+                return false;
+            }
+        }
+
+        // Register member in database
+        async function registerMemberInDB(memberData) {
+            if (!supabase) {
+                // Fallback to localStorage
+                return registerMemberLocal(memberData);
+            }
+
+            try {
+                // First check if PSN number already exists
+                const psnExists = await checkPsnExists(memberData.psn_number);
+                if (psnExists) {
+                    return {
+                        success: false,
+                        error: 'PSN number already registered'
+                    };
+                }
+
+                // Check if email already exists
+                const emailExists = await checkEmailExists(memberData.email);
+                if (emailExists) {
+                    return {
+                        success: false,
+                        error: 'Email already registered'
+                    };
+                }
+
+                // Add system fields
+                const completeMemberData = {
+                    ...memberData,
+                    email: memberData.email.toLowerCase(),
+                    is_admin: false,
+                    is_active: true,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+
+                // Insert into database
+                const { data, error } = await supabase
+                    .from('members')
+                    .insert([completeMemberData])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // If date of birth provided, create birthday event
+                if (memberData.date_of_birth) {
+                    await createEvent({
+                        member_id: data.id,
+                        event_type: 'birthday',
+                        event_date: memberData.date_of_birth,
+                        event_name: `${memberData.full_name}'s Birthday`,
+                        is_recurring: true,
+                        created_at: new Date().toISOString()
+                    });
+                }
+
+                // If wedding date provided, create anniversary event
+                if (memberData.wedding_date) {
+                    await createEvent({
+                        member_id: data.id,
+                        event_type: 'anniversary',
+                        event_date: memberData.wedding_date,
+                        event_name: `${memberData.full_name}'s Wedding Anniversary`,
+                        is_recurring: true,
+                        created_at: new Date().toISOString()
+                    });
+                }
+
+                // Log the registration
+                await logSystemAction('registration', `New member registered: ${memberData.full_name}`);
+
+                return {
+                    success: true,
+                    data: data,
+                    message: 'Registration successful!'
+                };
+
+            } catch (error) {
+                console.error('Error registering member:', error);
+                return {
+                    success: false,
+                    error: error.message || 'Registration failed'
+                };
+            }
+        }
+
+        // Create event in database
+        async function createEvent(eventData) {
+            if (!supabase) return;
+
+            try {
+                await supabase
+                    .from('events')
+                    .insert([eventData]);
+            } catch (error) {
+                console.error('Error creating event:', error);
+            }
+        }
+
+        // Log system action
+        async function logSystemAction(action, details) {
+            if (!supabase) return;
+
+            try {
+                await supabase
+                    .from('system_logs')
+                    .insert([{
+                        action: action,
+                        details: details,
+                        ip_address: await getClientIP(),
+                        created_at: new Date().toISOString()
+                    }]);
+            } catch (error) {
+                console.error('Error logging action:', error);
+            }
+        }
+
+        // Get client IP
+        async function getClientIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch {
+                return 'unknown';
+            }
+        }
+
+        // Fallback: Register in localStorage
+        function registerMemberLocal(memberData) {
+            try {
+                const members = JSON.parse(localStorage.getItem('psn_members') || '[]');
+
+                // Check for duplicates
+                const psnExists = members.some(m => m.psn_number === memberData.psn_number);
+                if (psnExists) {
+                    return {
+                        success: false,
+                        error: 'PSN number already registered'
+                    };
+                }
+
+                const emailExists = members.some(m => m.email.toLowerCase() === memberData.email.toLowerCase());
+                if (emailExists) {
+                    return {
+                        success: false,
+                        error: 'Email already registered'
+                    };
+                }
+
+                // Add member with ID and timestamp
+                const newMember = {
+                    ...memberData,
+                    id: Date.now().toString(),
+                    email: memberData.email.toLowerCase(),
+                    is_admin: false,
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                };
+
+                members.push(newMember);
+                localStorage.setItem('psn_members', JSON.stringify(members));
+
+                // Also store events in localStorage if dates provided
+                if (memberData.date_of_birth) {
+                    const events = JSON.parse(localStorage.getItem('psn_events') || '[]');
+                    events.push({
+                        id: Date.now().toString(),
+                        member_id: newMember.id,
+                        member_name: newMember.full_name,
+                        event_type: 'birthday',
+                        event_date: memberData.date_of_birth,
+                        event_name: `${newMember.full_name}'s Birthday`,
+                        is_recurring: true,
+                        created_at: new Date().toISOString()
+                    });
+                    localStorage.setItem('psn_events', JSON.stringify(events));
+                }
+
+                if (memberData.wedding_date) {
+                    const events = JSON.parse(localStorage.getItem('psn_events') || '[]');
+                    events.push({
+                        id: Date.now().toString(),
+                        member_id: newMember.id,
+                        member_name: newMember.full_name,
+                        event_type: 'anniversary',
+                        event_date: memberData.wedding_date,
+                        event_name: `${newMember.full_name}'s Wedding Anniversary`,
+                        is_recurring: true,
+                        created_at: new Date().toISOString()
+                    });
+                    localStorage.setItem('psn_events', JSON.stringify(events));
+                }
+
+                return {
+                    success: true,
+                    data: newMember,
+                    message: 'Registration successful! (Local storage)'
+                };
+
+            } catch (error) {
+                console.error('Error in local registration:', error);
+                return {
+                    success: false,
+                    error: 'Local registration failed'
+                };
+            }
+        }
+
+        // ==================== UI FUNCTIONS ====================
+
+        function showAlert(alertId, message, show = true) {
+            const alert = document.getElementById(alertId);
+            const messageSpan = alert.querySelector('span');
+
+            if (messageSpan) {
+                messageSpan.textContent = message;
+            }
+
+            if (show) {
+                alert.classList.add('show');
+            } else {
+                alert.classList.remove('show');
+            }
+        }
+
+        function showSuccess(message) {
+            showAlert('successAlert', message, true);
+            showAlert('errorAlert', '', false);
+            showAlert('infoAlert', '', false);
+        }
+
+        function showError(message) {
+            showAlert('errorAlert', message, true);
+            showAlert('successAlert', '', false);
+            showAlert('infoAlert', '', false);
+        }
+
+        function showInfo(message) {
+            showAlert('infoAlert', message, true);
+            showAlert('successAlert', '', false);
+            showAlert('errorAlert', '', false);
+        }
+
+        function setLoading(isLoading) {
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const spinner = submitBtn.querySelector('.spinner');
+
+            if (isLoading) {
+                submitBtn.disabled = true;
+                btnText.textContent = 'Registering...';
+                spinner.style.display = 'inline-block';
+                submitBtn.classList.add('btn-loading');
+            } else {
+                submitBtn.disabled = false;
+                btnText.textContent = 'Register Account';
+                spinner.style.display = 'none';
+                submitBtn.classList.remove('btn-loading');
+            }
+        }
+
+        // ==================== FORM VALIDATION ====================
 
         // Password strength checker
         function checkPasswordStrength(password) {
             let strength = 0;
+            const feedback = [];
 
             // Length check
             if (password.length >= 8) strength++;
@@ -238,22 +743,40 @@
 
             // Complexity checks
             if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
             if (/[0-9]/.test(password)) strength++;
             if (/[^A-Za-z0-9]/.test(password)) strength++;
 
             // Update UI
-            const strengthClasses = ['strength-weak', 'strength-fair', 'strength-good', 'strength-strong', 'strength-strong'];
-            const strengthLabels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+            const strengthClasses = ['strength-weak', 'strength-weak', 'strength-fair', 'strength-good', 'strength-strong', 'strength-strong'];
+            const strengthLabels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
 
             strengthFill.className = 'strength-fill ' + (strengthClasses[strength] || 'strength-weak');
             strengthText.textContent = 'Password strength: ' + (strengthLabels[strength] || 'Very Weak');
-            strengthText.style.color = strength >= 3 ? '#2ecc71' : strength >= 2 ? '#3498db' : '#e74c3c';
+
+            // Color coding
+            if (strength >= 4) {
+                strengthText.style.color = '#2ecc71';
+            } else if (strength >= 3) {
+                strengthText.style.color = '#3498db';
+            } else if (strength >= 2) {
+                strengthText.style.color = '#f39c12';
+            } else {
+                strengthText.style.color = '#e74c3c';
+            }
+
+            return strength;
         }
 
         // Validate password match
         function validatePasswordMatch() {
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
 
             if (confirmPassword && password !== confirmPassword) {
                 passwordError.textContent = 'Passwords do not match';
@@ -266,132 +789,296 @@
             }
         }
 
-        // Form validation
-        function validateForm() {
+        // Validate PSN number format
+        function validatePsnNumber(psnNumber) {
+            // Basic validation - can be customized
+            const psnRegex = /^[A-Za-z0-9\-]+$/;
+            return psnRegex.test(psnNumber) && psnNumber.length >= 5;
+        }
+
+        // Validate email format
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Validate phone number
+        function validatePhone(phone) {
+            const phoneRegex = /^[0-9]{11}$/;
+            return phoneRegex.test(phone.replace(/\D/g, ''));
+        }
+
+        // Real-time email validation with duplicate check
+        let emailCheckTimeout;
+        async function validateEmailRealTime(email) {
+            const emailValidation = document.getElementById('emailValidation');
+            const emailInput = document.getElementById('email');
+
+            if (!email) {
+                emailValidation.textContent = '';
+                emailInput.classList.remove('error');
+                return false;
+            }
+
+            if (!validateEmail(email)) {
+                emailValidation.textContent = 'Please enter a valid email address';
+                emailValidation.style.color = '#e74c3c';
+                emailInput.classList.add('error');
+                return false;
+            }
+
+            // Clear previous timeout
+            if (emailCheckTimeout) {
+                clearTimeout(emailCheckTimeout);
+            }
+
+            // Show checking message
+            emailValidation.textContent = 'Checking availability...';
+            emailValidation.style.color = '#3498db';
+
+            // Debounce the check
+            emailCheckTimeout = setTimeout(async () => {
+                if (!supabase) {
+                    emailValidation.textContent = '✓ Email format valid';
+                    emailValidation.style.color = '#2ecc71';
+                    emailInput.classList.remove('error');
+                    return true;
+                }
+
+                const emailExists = await checkEmailExists(email);
+                if (emailExists) {
+                    emailValidation.textContent = '✗ Email already registered';
+                    emailValidation.style.color = '#e74c3c';
+                    emailInput.classList.add('error');
+                    return false;
+                } else {
+                    emailValidation.textContent = '✓ Email available';
+                    emailValidation.style.color = '#2ecc71';
+                    emailInput.classList.remove('error');
+                    return true;
+                }
+            }, 500);
+
+            return true;
+        }
+
+        // Validate form
+        async function validateForm() {
             let isValid = true;
+
+            // Get form values
+            const formData = {
+                psnNumber: document.getElementById('psnNumber').value.trim(),
+                fullName: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                password: document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirmPassword').value,
+                dateOfBirth: document.getElementById('dateOfBirth').value,
+                weddingDate: document.getElementById('weddingDate').value,
+                consent: document.getElementById('consent').checked
+            };
 
             // Clear previous errors
             document.querySelectorAll('.form-control.error').forEach(el => {
                 el.classList.remove('error');
             });
 
-            // Required fields check
-            const requiredFields = registerForm.querySelectorAll('[required]');
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.classList.add('error');
-                    isValid = false;
-                }
-            });
+            // Required fields
+            if (!formData.psnNumber) {
+                document.getElementById('psnNumber').classList.add('error');
+                isValid = false;
+            } else if (!validatePsnNumber(formData.psnNumber)) {
+                document.getElementById('psnNumber').classList.add('error');
+                isValid = false;
+            }
+
+            if (!formData.fullName) {
+                document.getElementById('fullName').classList.add('error');
+                isValid = false;
+            }
+
+            if (!formData.email) {
+                document.getElementById('email').classList.add('error');
+                isValid = false;
+            } else if (!validateEmail(formData.email)) {
+                document.getElementById('email').classList.add('error');
+                isValid = false;
+            }
+
+            if (!formData.phone) {
+                document.getElementById('phone').classList.add('error');
+                isValid = false;
+            } else if (!validatePhone(formData.phone)) {
+                document.getElementById('phone').classList.add('error');
+                isValid = false;
+            }
 
             // Password validation
+            const passwordStrength = checkPasswordStrength(formData.password);
+            if (formData.password.length < 8) {
+                document.getElementById('password').classList.add('error');
+                isValid = false;
+            }
+
             if (!validatePasswordMatch()) {
                 isValid = false;
             }
 
-            // Email validation
-            const emailField = document.getElementById('email');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (emailField.value && !emailRegex.test(emailField.value)) {
-                emailField.classList.add('error');
-                isValid = false;
-            }
-
-            // Consent check
-            const consentCheckbox = document.getElementById('consent');
-            if (!consentCheckbox.checked) {
-                consentCheckbox.parentElement.parentElement.style.borderColor = '#e74c3c';
+            // Consent
+            if (!formData.consent) {
+                document.getElementById('consent').parentElement.parentElement.style.borderColor = '#e74c3c';
                 isValid = false;
             } else {
-                consentCheckbox.parentElement.parentElement.style.borderColor = '';
+                document.getElementById('consent').parentElement.parentElement.style.borderColor = '';
             }
 
             return isValid;
         }
 
-        // Handle form submission
+        // ==================== FORM SUBMISSION ====================
+
         async function handleSubmit(event) {
             event.preventDefault();
 
-            if (!validateForm()) {
-                errorAlert.textContent = 'Please fill in all required fields correctly.';
-                errorAlert.classList.add('show');
+            // Hide all alerts
+            showAlert('successAlert', '', false);
+            showAlert('errorAlert', '', false);
+            showAlert('infoAlert', '', false);
+
+            // Validate form
+            if (!await validateForm()) {
+                showError('Please fill in all required fields correctly.');
                 return;
             }
 
-            // Prepare form data
-            const formData = {
-                psnNumber: document.getElementById('psnNumber').value.trim(),
-                fullName: document.getElementById('fullName').value.trim(),
+            // Prepare data
+            const memberData = {
+                psn_number: document.getElementById('psnNumber').value.trim(),
+                full_name: document.getElementById('fullName').value.trim(),
                 email: document.getElementById('email').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                password: passwordInput.value,
-                dateOfBirth: document.getElementById('dateOfBirth').value || null,
-                weddingDate: document.getElementById('weddingDate').value || null,
-                consentGiven: true,
-                consentDate: new Date().toISOString()
+                phone: document.getElementById('phone').value.replace(/\D/g, ''),
+                password_hash: btoa(document.getElementById('password').value), // Simple encoding - in production use proper hashing
+                date_of_birth: document.getElementById('dateOfBirth').value || null,
+                wedding_date: document.getElementById('weddingDate').value || null
             };
 
+            // Check PSN number availability (only for database)
+            if (supabase) {
+                const psnExists = await checkPsnExists(memberData.psn_number);
+                if (psnExists) {
+                    showError('PSN number already registered. Please use a different PSN number.');
+                    document.getElementById('psnNumber').classList.add('error');
+                    document.getElementById('psnNumber').focus();
+                    return;
+                }
+            }
+
             // Show loading state
-            submitBtn.classList.add('btn-loading');
-            submitBtn.disabled = true;
+            setLoading(true);
 
             try {
-                // For now, simulate API call
-                // In production, replace with: const response = await api.register(formData);
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                // Register member
+                const result = await registerMemberInDB(memberData);
 
-                // Show success
-                successAlert.classList.add('show');
-                errorAlert.classList.remove('show');
+                if (result.success) {
+                    showSuccess(result.message || 'Registration successful!');
 
-                // Reset form
-                registerForm.reset();
-                strengthFill.className = 'strength-fill';
-                strengthText.textContent = 'Password strength';
+                    // Reset form
+                    document.getElementById('registerForm').reset();
+                    document.getElementById('strengthFill').className = 'strength-fill';
+                    document.getElementById('strengthText').textContent = 'Password strength';
+                    document.getElementById('strengthText').style.color = '#7f8c8d';
 
-                // Redirect to login after 2 seconds
-                setTimeout(() => {
-                    window.location.href = '/pages/login.html';
-                }, 2000);
+                    // Redirect to login after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 3000);
+
+                } else {
+                    showError(result.error || 'Registration failed. Please try again.');
+                }
 
             } catch (error) {
-                errorAlert.textContent = error.message || 'Registration failed. Please try again.';
-                errorAlert.classList.add('show');
-                successAlert.classList.remove('show');
+                console.error('Registration error:', error);
+                showError('An unexpected error occurred. Please try again.');
+
             } finally {
-                submitBtn.classList.remove('btn-loading');
-                submitBtn.disabled = false;
+                setLoading(false);
             }
         }
 
-        // Event Listeners
-        passwordInput.addEventListener('input', () => {
-            checkPasswordStrength(passwordInput.value);
-            validatePasswordMatch();
-        });
+        // ==================== EVENT LISTENERS ====================
 
-        confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Supabase
+            const dbInitialized = initSupabase();
 
-        registerForm.addEventListener('submit', handleSubmit);
+            if (dbInitialized) {
+                showInfo('Connected to database. Ready for registration.');
+            } else {
+                showInfo('Using local storage. Data will be saved locally.');
+            }
 
-        // Real-time validation for required fields
-        registerForm.querySelectorAll('[required]').forEach(field => {
-            field.addEventListener('blur', () => {
-                if (!field.value.trim()) {
-                    field.classList.add('error');
-                } else {
-                    field.classList.remove('error');
-                }
-            });
-        });
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
             // Set max date for date inputs to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('dateOfBirth').max = today;
             document.getElementById('weddingDate').max = today;
+
+            // Set min date for date of birth (assuming minimum age 18)
+            const minDate = new Date();
+            minDate.setFullYear(minDate.getFullYear() - 100);
+            document.getElementById('dateOfBirth').min = minDate.toISOString().split('T')[0];
+
+            // Real-time validation
+            document.getElementById('password').addEventListener('input', function () {
+                checkPasswordStrength(this.value);
+                validatePasswordMatch();
+            });
+
+            document.getElementById('confirmPassword').addEventListener('input', validatePasswordMatch);
+
+            document.getElementById('email').addEventListener('input', function () {
+                validateEmailRealTime(this.value);
+            });
+
+            document.getElementById('psnNumber').addEventListener('blur', function () {
+                if (!validatePsnNumber(this.value)) {
+                    this.classList.add('error');
+                } else {
+                    this.classList.remove('error');
+                }
+            });
+
+            document.getElementById('phone').addEventListener('blur', function () {
+                if (!validatePhone(this.value)) {
+                    this.classList.add('error');
+                } else {
+                    this.classList.remove('error');
+                }
+            });
+
+            // Form submission
+            document.getElementById('registerForm').addEventListener('submit', handleSubmit);
+
+            // Real-time validation for required fields
+            document.querySelectorAll('[required]').forEach(field => {
+                field.addEventListener('blur', function () {
+                    if (!this.value.trim()) {
+                        this.classList.add('error');
+                    } else {
+                        this.classList.remove('error');
+                    }
+                });
+            });
+
+            // Consent checkbox styling
+            document.getElementById('consent').addEventListener('change', function () {
+                if (this.checked) {
+                    this.parentElement.parentElement.style.borderColor = '';
+                }
+            });
         });
     </script>
 </body>
